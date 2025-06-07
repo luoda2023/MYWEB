@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字滑块拼图 - 智力与解压</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+
+        /* 菜单CSS */
+        .floating-nav {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #1E3A5F;
+            border-radius: 8px 0 0 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: width 0.3s;
+            width: 50px;
+            z-index: 9999;
+        }
+        .floating-nav:hover { width:250px; }
+        .nav-list {list-style: none; margin:0; padding:0;}
+        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
+        .nav-list li:hover {background:#5E8BFF;}
+        .nav-list li i {font-size:18px; color:#4ECDC4;}
+        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
+        .floating-nav:hover .nav-list li a, 
+        .floating-nav:hover .nav-list li span {opacity:1;}
+        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
+        @media (max-width:768px){.floating-nav{display:none;}}
+        /* 下面放你的其他body样式... */
+
+
+
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative; /* 为LOGO定位提供参考 */
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        #logo-container {
+            position: absolute;
+            top: 0; /* 初始顶部，JS动态调整 */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #logo {
+            max-width: 88px; /* 缩小到2/3（100px * 2/3） */
+            width: 25vw;
+            display: block;
+            cursor: pointer;
+        }
+        #game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: center;
+            max-width: 90vw;
+            width: 400px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1; /* 确保游戏框在LOGO和粒子之上 */
+        }
+        h1 {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        #puzzle {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            background: #f0f0f0;
+            padding: 8px;
+            border-radius: 10px;
+            margin: 15px auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .tile {
+            width: 99%;
+            height: 80px;
+            background: #ffffff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            touch-action: manipulation;
+        }
+        .tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .empty {
+            background: transparent;
+            box-shadow: none;
+            cursor: default;
+        }
+        .highlight {
+            background: #ff9500;
+            color: white;
+            transform: scale(1.05);
+        }
+        button {
+            padding: 18px 20px;
+            font-size: 20px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 15px;
+            touch-action: manipulation;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #message {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #6e8efb;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 400px) {
+            #game-container {
+                padding: 10px;
+                width: 95vw;
+            }
+            #logo {
+                max-width: 53px; /* 缩小到2/3（80px * 2/3） */
+                width: 20vw;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .tile {
+                width: 100%;
+                height: 60px;
+                font-size: 20px;
+            }
+            #puzzle {
+                gap: 8px;
+                padding: 6px;
+            }
+            button {
+                padding: 12px 18px;
+                font-size: 18px;
+            }
+            #message {
+                font-size: 14px;
+            }
+            .loader {
+                width: 14px;
+                height: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-bg"></canvas>
+    <div id="logo-container">
+        <a href="index.html">
+            <img id="logo" src="logo.png" alt="Game Logo">
+        </a>
+    </div>
+    <div id="game-container">
+        <h1>数字滑块拼图</h1>
+        <div id="puzzle"></div>
+        <button onclick="resetGame()">重新开始</button>
+        <button id="auto-button" onclick="autoStep()">自动游戏</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // 动态调整LOGO位置
+        function positionLogo() {
+            const logoContainer = document.getElementById('logo-container');
+            const gameContainer = document.getElementById('game-container');
+            const gameRect = gameContainer.getBoundingClientRect();
+            const topSpace = gameRect.top; // 游戏框顶部到网页顶部的距离
+            logoContainer.style.top = `${topSpace /2.5}px`; // 放置在游戏框与顶部的中间
+        }
+
+        window.addEventListener('load', positionLogo);
+        window.addEventListener('resize', positionLogo); // 窗口大小变化时重新定位
+
+        // 粒子背景效果
+        const canvas = document.getElementById('particle-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 4 + 1;
+                this.speedX = Math.random() * 1.5 - 0.75;
+                this.speedY = Math.random() * 1.5 - 0.75;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.05;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            for (let i = 0; i < 40; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+                if (p.size <= 0.2) {
+                    particles.splice(i, 1);
+                    particles.push(new Particle());
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // 游戏逻辑
+        const puzzle = document.getElementById('puzzle');
+        const message = document.getElementById('message');
+        const autoButton = document.getElementById('auto-button');
+        let board = [];
+        const size = 4;
+        let isAutoMode = false;
+        let solutionMoves = [];
+        let currentMoveIndex = 0;
+
+        function initBoard() {
+            board = [];
+            for (let i = 1; i < size * size; i++) {
+                board.push(i);
+            }
+            board.push(0);
+            shuffleBoard();
+            renderBoard();
+        }
+
+        function shuffleBoard() {
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            let emptyIndex = board.indexOf(0);
+            for (let i = 0; i < 50; i++) {
+                const validMoves = [];
+                const row = Math.floor(emptyIndex / size);
+                const col = emptyIndex % size;
+                for (const [dr, dc] of directions) {
+                    const newRow = row + dr;
+                    const newCol = col + dc;
+                    if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size) {
+                        validMoves.push(newRow * size + newCol);
+                    }
+                }
+                const moveIndex = validMoves[Math.floor(Math.random() * validMoves.length)];
+                [board[emptyIndex], board[moveIndex]] = [board[moveIndex], board[emptyIndex]];
+                emptyIndex = moveIndex;
+            }
+            if (!isSolvable() || board.join(',') === [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0].join(',')) {
+                shuffleBoard();
+            }
+        }
+
+        function isSolvable() {
+            let inversionCount = 0;
+            for (let i = 0; i < board.length - 1; i++) {
+                for (let j = i + 1; j < board.length; j++) {
+                    if (board[i] && board[j] && board[i] > board[j]) {
+                        inversionCount++;
+                    }
+                }
+            }
+            const emptyRow = Math.floor(board.indexOf(0) / size);
+            return (inversionCount + emptyRow) % 2 === 1;
+        }
+
+        function renderBoard(highlightIndex = -1) {
+            puzzle.innerHTML = '';
+            board.forEach((num, index) => {
+                const tile = document.createElement('div');
+                tile.className = num === 0 ? 'tile empty' : 'tile';
+                if (index === highlightIndex) {
+                    tile.classList.add('highlight');
+                }
+                tile.textContent = num || '';
+                if (num !== 0 && !isAutoMode) {
+                    tile.addEventListener('click', () => moveTile(index));
+                }
+                puzzle.appendChild(tile);
+            });
+            checkWin();
+        }
+
+        function moveTile(index) {
+            if (isAutoMode) return;
+            const emptyIndex = board.indexOf(0);
+            const row = Math.floor(index / size);
+            const col = index % size;
+            const emptyRow = Math.floor(emptyIndex / size);
+            const emptyCol = emptyIndex % size;
+
+            if ((Math.abs(row - emptyRow) === 1 && col === emptyCol) ||
+                (Math.abs(col - emptyCol) === 1 && row === emptyRow)) {
+                [board[index], board[emptyIndex]] = [board[emptyIndex], board[index]];
+                renderBoard();
+            }
+        }
+
+        function checkWin() {
+            const correct = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+            if (board.every((num, i) => num === correct[i])) {
+                message.textContent = '恭喜！你赢了！';
+                isAutoMode = false;
+                autoButton.textContent = '自动游戏';
+                autoButton.disabled = true;
+            } else if (isAutoMode) {
+                message.textContent = solutionMoves.length > 0 
+                    ? `点击“下一步”继续演示（第${currentMoveIndex + 1}/${solutionMoves.length}步）`
+                    : '点击“下一步”继续演示';
+            } else {
+                message.textContent = '';
+            }
+        }
+
+        function resetGame() {
+            isAutoMode = false;
+            solutionMoves = [];
+            currentMoveIndex = 0;
+            autoButton.textContent = '自动游戏';
+            autoButton.disabled = false;
+            message.textContent = '';
+            initBoard();
+            positionLogo(); // 重置后重新定位LOGO
+        }
+
+        function solvePuzzle() {
+            const target = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+            const queue = [{ board: [...board], moves: [], g: 0 }];
+            const visited = new Set();
+            visited.add(board.join(','));
+
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+            function getManhattanDistance(board) {
+                let distance = 0;
+                for (let i = 0; i < board.length; i++) {
+                    if (board[i] === 0) continue;
+                    const targetIndex = board[i] - 1;
+                    const currentRow = Math.floor(i / size);
+                    const currentCol = i % size;
+                    const targetRow = Math.floor(targetIndex / size);
+                    const targetCol = targetIndex % size;
+                    distance += Math.abs(currentRow - targetRow) + Math.abs(currentCol - targetCol);
+                }
+                return distance;
+            }
+
+            const maxIterations = 10000;
+            let iterations = 0;
+
+            while (queue.length > 0) {
+                if (iterations++ > maxIterations) {
+                    console.log('A*超时，迭代次数：', iterations);
+                    return null;
+                }
+
+                queue.sort((a, b) => (a.g + getManhattanDistance(a.board)) - (b.g + getManhattanDistance(b.board)));
+                const { board: currentBoard, moves, g } = queue.shift();
+
+                if (currentBoard.join(',') === target.join(',')) {
+                    console.log('找到路径，步数：', moves.length);
+                    return moves;
+                }
+
+                const emptyIndex = currentBoard.indexOf(0);
+                const row = Math.floor(emptyIndex / size);
+                const col = emptyIndex % size;
+
+                for (const [dr, dc] of directions) {
+                    const newRow = row + dr;
+                    const newCol = col + dc;
+                    if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size) {
+                        const newIndex = newRow * size + newCol;
+                        const newBoard = [...currentBoard];
+                        [newBoard[emptyIndex], newBoard[newIndex]] = [newBoard[newIndex], newBoard[emptyIndex]];
+                        const boardKey = newBoard.join(',');
+
+                        if (!visited.has(boardKey)) {
+                            visited.add(boardKey);
+                            queue.push({
+                                board: newBoard,
+                                moves: [...moves, newIndex],
+                                g: g + 1
+                            });
+                        }
+                    }
+                }
+            }
+            console.log('未找到路径，迭代次数：', iterations);
+            return null;
+        }
+
+        function autoStep() {
+            if (!isAutoMode) {
+                isAutoMode = true;
+                autoButton.textContent = '下一步';
+                autoButton.disabled = true;
+                message.textContent = '正在计算路径... <span class="loader"></span>';
+
+                requestAnimationFrame(() => {
+                    const startTime = performance.now();
+                    solutionMoves = solvePuzzle();
+                    const endTime = performance.now();
+                    console.log('路径计算耗时：', endTime - startTime, 'ms');
+
+                    if (endTime - startTime > 500) {
+                        message.textContent = '路径计算超时，正在重置拼图...';
+                        setTimeout(() => {
+                            resetGame();
+                            message.textContent = '拼图已重置，请重试自动游戏！';
+                        }, 1000);
+                        return;
+                    }
+
+                    if (!solutionMoves || solutionMoves.length === 0) {
+                        console.log('solutionMoves 无效：', solutionMoves);
+                        message.textContent = '路径无效，正在重置拼图...';
+                        setTimeout(() => {
+                            resetGame();
+                            message.textContent = '拼图已重置，请重试自动游戏！';
+                        }, 1000);
+                        return;
+                    }
+
+                    autoButton.disabled = false;
+                    console.log('solutionMoves:', solutionMoves);
+                    message.textContent = `点击“下一步”继续演示（第1/${solutionMoves.length}步）`;
+                    renderBoard(solutionMoves[currentMoveIndex]);
+                });
+            } else if (currentMoveIndex < solutionMoves.length) {
+                console.log('执行第', currentMoveIndex + 1, '步，移动索引：', solutionMoves[currentMoveIndex]);
+                const moveIndex = solutionMoves[currentMoveIndex];
+                const emptyIndex = board.indexOf(0);
+                const row = Math.floor(moveIndex / size);
+                const col = moveIndex % size;
+                const emptyRow = Math.floor(emptyIndex / size);
+                const emptyCol = emptyIndex % size;
+
+                if ((Math.abs(row - emptyRow) === 1 && col === emptyCol) ||
+                    (Math.abs(col - emptyCol) === 1 && row === emptyRow)) {
+                    [board[moveIndex], board[emptyIndex]] = [board[emptyIndex], board[moveIndex]];
+                    currentMoveIndex++;
+                    const nextHighlight = currentMoveIndex < solutionMoves.length ? solutionMoves[currentMoveIndex] : -1;
+                    renderBoard(nextHighlight);
+                } else {
+                    console.log('无效移动，索引：', moveIndex);
+                    message.textContent = '路径无效，正在重置拼图...';
+                    setTimeout(() => {
+                        resetGame();
+                        message.textContent = '拼图已重置，请重试自动游戏！';
+                    }, 1000);
+                    return;
+                }
+            } else {
+                console.log('所有移动完成');
+                isAutoMode = false;
+                autoButton.textContent = '自动游戏';
+                renderBoard(-1);
+                checkWin();
+            }
+        }
+
+        initBoard();
+    </script>
+
+
+    <!-- 直接插入菜单HTML，复制到每个页面！ -->
+    <div class="floating-nav">
+        <ul class="nav-list">
+            <li><i class="fas fa-home"></i><a href="index.html">首页</a></li>
+            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
+            <li class="main-menu">
+                <i class="fas fa-gamepad"></i>
+                <span>解压游戏</span>
+            </li>
+            <li><i class="fas fa-bug"></i><a href="mifeng.html">蜜蜂大冒险</a></li>
+
+            <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
+            <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
+        </ul>
+    </div>
+
+
+
+
+</body>
+</html>

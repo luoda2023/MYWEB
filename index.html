@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUODA | AI工程设计创新者</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+
+    <style>
+
+
+
+        /* 菜单CSS */
+        .floating-nav {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #1E3A5F;
+            border-radius: 8px 0 0 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: width 0.3s;
+            width: 50px;
+            z-index: 9999;
+        }
+        .floating-nav:hover { width:250px; }
+        .nav-list {list-style: none; margin:0; padding:0;}
+        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
+        .nav-list li:hover {background:#5E8BFF;}
+        .nav-list li i {font-size:18px; color:#4ECDC4;}
+        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
+        .floating-nav:hover .nav-list li a, 
+        .floating-nav:hover .nav-list li span {opacity:1;}
+        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
+        @media (max-width:768px){.floating-nav{display:none;}}
+        /* 下面放你的其他body样式... */
+
+
+    :root {
+        --primary-dark: #0F1A2A;
+        --primary-light: #1E3A5F;
+        --accent-teal: #4ECDC4;
+        --accent-blue: #5E8BFF;
+        --accent-yellow: #ffc33a;
+        --accent-green: #7dfb7d;
+        --text-primary: #F8FDFF;
+        --text-secondary: #B8D8FF;
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    }
+    body {
+        background: var(--primary-dark);
+        color: var(--text-primary);
+        line-height: 1.7;
+        overflow-x: hidden;
+    }
+    .nav-container {
+        padding: 1rem 25%;
+        background: rgba(15, 26, 42, 0.86);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid rgba(94, 139, 255, 0.12);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+    nav {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo {
+        display: inline-block;
+        height: 55px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .logo img {
+        height: 100%;
+        width: auto;
+        position: relative;
+        z-index: 2;
+    }
+    .nav-links {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        position: relative;
+    }
+    .nav-btn-base {
+        display: flex;
+        align-items: center;
+        gap: 0.38em;
+        background: linear-gradient(120deg, rgba(78, 205, 196, 0.14) 0%, rgba(94, 139, 255, 0.08) 100%);
+        border: 1.5px solid rgba(78,205,196,0.18);
+        border-radius: 8px;
+        color: var(--accent-teal);
+        text-decoration: none;
+        font-weight: 400 !important;
+        font-size: 0.97rem !important;
+        padding: 0.48rem 1.0rem !important;
+        min-width: 0;
+        min-height: 0;
+        height: 2.8rem !important;
+        box-sizing: border-box;
+        transition: background 0.13s, color 0.13s, transform 0.14s, border-color 0.18s, box-shadow 0.13s;
+        box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08), 0 0.5px 3px rgba(78,205,196,0.07);
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        z-index: 1;
+        line-height: 1;
+    }
+    .nav-btn-base .icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 0.11em;
+        width: 1.03em;
+        height: 1.03em;
+    }
+    .nav-btn-base .sweep-light {
+        pointer-events: none;
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        z-index: 2;
+        display: block;
+    }
+    .nav-btn-base .sweep-light::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -30%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+            112deg,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.11) 47%,
+            rgba(94,139,255,0.24) 55%,
+            rgba(255,255,255,0.10) 64%,
+            rgba(255,255,255,0) 100%
+        );
+        filter: blur(1px);
+        border-radius: 10px;
+        animation: sweep-light-anim 2.8s linear infinite;
+        opacity: 0.86;
+    }
+    .nav-btn-base.sim-hover .sweep-light,
+    .nav-btn-base:hover .sweep-light {
+        display: none !important;
+    }
+    .nav-btn-base.sim-hover,
+    .nav-btn-base:hover {
+        background: linear-gradient(120deg, rgba(78,205,196,0.22) 0%, rgba(94,139,255,0.15) 100%);
+        color: #fff;
+        border-color: var(--accent-teal);
+        box-shadow: 0 6px 18px rgba(78,205,196,0.17);
+        transform: translateY(-2.5px) scale(1.01);
+    }
+    .nav-btn-base:active {
+        background: linear-gradient(120deg, rgba(94,139,255,0.17) 0%,rgba(78, 205, 196, 0.13) 100%);
+        color: #fff;
+        transform: scale(0.97);
+        box-shadow: 0 0 0 transparent;
+    }
+    .nav-links .nav-app-btn,
+    .nav-links .nav-wechat-btn {
+        font-weight: 400 !important;
+        font-size: 0.97rem !important;
+        padding: 0.48rem 1.0rem !important;
+        min-width: 0;
+        min-height: 0;
+        height: 2.8rem !important;
+    }
+    .nav-links .nav-qrcode-btn {
+        font-weight: 400 !important;
+        font-size: 0.97rem !important;
+        padding: 0.48rem 1.0rem !important;
+        min-width: 0;
+        min-height: 0;
+        height: 2.8rem !important;
+        margin-left: 0.3rem !important;
+    }
+    .nav-links a, 
+    .nav-app-btn,
+    .nav-wechat-btn,
+    .nav-qrcode-btn {
+        font-weight: 400 !important;
+        font-size: 0.97rem !important;
+        padding: 0.40rem 1.0rem !important;
+        border-radius: 7px;
+        min-width: 0;
+        height: 2.8rem !important;
+    }
+    .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: 7px;
+        font-weight: 400 !important;
+        font-size: 0.97rem !important;
+        padding: 0.40rem 1.0rem !important;
+        min-width: 0;
+        min-height: 0;
+        height: 2.8rem !important;
+        line-height: 1.1;
+    }
+    .nav-links a::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--accent-teal);
+        transition: all 0.3s ease;
+    }
+    .nav-links a:hover {
+        color: var(--text-primary);
+    }
+    .nav-links a:hover::before {
+        width: 100%;
+        left: 0;
+    }
+    .nav-links .contact-btn {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .nav-container {
+            padding: 0.8rem 5%;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-links .nav-app-btn,
+        .nav-links .nav-wechat-btn,
+        .nav-links .nav-qrcode-btn {
+            display: none !important;
+        }
+        .nav-links .nav-unzip-btn-pc {
+            display: none !important;
+        }
+        .nav-links .nav-unzip-btn-mobile {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem !important;
+            font-weight: 400 !important;
+            padding: 0.6rem 1.1rem !important;
+            min-width: 110px !important;
+            height: 2.45rem !important;
+            border-radius: 8px !important;
+            border: 1.7px solid rgba(78,205,196,0.19) !important;
+            background: linear-gradient(120deg, rgba(78, 205, 196, 0.17) 0%, rgba(94, 139, 255, 0.07) 100%) !important;
+            color: var(--accent-teal);
+            box-shadow: 0 3px 12px rgba(30, 58, 95, 0.09), 0 0.5px 5px rgba(78,205,196,0.08);
+            letter-spacing: 0.04em;
+            text-align: center;
+            transition: background 0.13s, color 0.13s, transform 0.14s, border-color 0.18s, opacity 0.13s;
+            backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(7px);
+            margin-top: 0 !important;
+            outline: none;
+            font-family: inherit;
+            line-height: 1;
+            box-sizing: border-box;
+            user-select: none;
+            cursor: pointer;
+            opacity: 0.68 !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-links .nav-unzip-btn-mobile .sweep-light {
+            display: block !important;
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            z-index: 2;
+        }
+        .nav-links .nav-unzip-btn-mobile .sweep-light::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -30%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(
+                112deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.11) 47%,
+                rgba(94, 139, 255, 0.24) 55%,
+                rgba(255,255,255,0.10) 64%,
+                rgba(255,255,255,0) 100%
+            );
+            filter: blur(1px);
+            border-radius: 10px;
+            animation: sweep-light-anim 2.8s linear infinite;
+            opacity: 0.86;
+            animation-delay: 0s;
+        }
+        .nav-links .nav-unzip-btn-mobile.sim-hover .sweep-light,
+        .nav-links .nav-unzip-btn-mobile:hover .sweep-light {
+            display:none !important;
+        }
+        .nav-links a:not(.contact-btn):not(.nav-unzip-btn-mobile) {
+            display: none !important;
+        }
+        .nav-links .contact-btn {
+            display: none !important;
+        }
+    }
+    @media (min-width: 769px) {
+        .nav-links .contact-btn {
+            display: none !important;
+        }
+        .nav-links .nav-app-btn,
+        .nav-links .nav-wechat-btn,
+        .nav-links .nav-qrcode-btn {
+            display: flex !important;
+        }
+        .nav-links .nav-unzip-btn-pc {
+            display: flex !important;
+        }
+        .nav-links .nav-unzip-btn-mobile {
+            display: none !important;
+        }
+    }
+    @media (max-width: 992px) {
+        .nav-container {
+            padding: 0.8rem 8%;
+        }
+        .nav-links {
+            gap: 1.5rem;
+        }
+    }
+
+    .unzip-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 220px;
+        background: rgba(22,38,56,0.98);
+        border: 1.4px solid rgba(78,205,196,0.19);
+        box-shadow: 0 8px 24px rgba(78,205,196,0.11), 0 0.5px 8px rgba(94,139,255,0.11);
+        border-radius: 11px;
+        z-index: 1111;
+        padding: 0.74rem 0;
+        animation: unzip-menu-drop 0.23s cubic-bezier(.5,1.8,.7,.7);
+        display: none;
+        transition: opacity 0.15s;
+    }
+    @keyframes unzip-menu-drop {
+        0% { transform: translateY(-20px) scale(0.98); opacity: 0; }
+        80% { transform: translateY(3px) scale(1.04); }
+        100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .unzip-dropdown-menu.show {
+        display: block;
+        opacity: 1;
+    }
+    .unzip-menu-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--accent-yellow,#ffc33a);
+        margin-bottom: 0.16em;
+        padding: 0.61em 1.25em 0.41em 1.5em;
+        letter-spacing: 1.2px;
+        transition: color 0.16s;
+    }
+    .unzip-dropdown-menu .unzip-menu-item {
+        display: block;
+        cursor: pointer;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        font-size: 1.02rem;
+        color: var(--accent-teal);
+        padding: 0.56em 1.55em 0.56em 1.55em;
+        transition: background 0.13s, color 0.13s, transform 0.13s;
+        border-radius: 6px;
+    }
+    .unzip-dropdown-menu .unzip-menu-item:hover, .unzip-dropdown-menu .unzip-menu-item:focus {
+        color: #fff;
+        background: linear-gradient(90deg, rgba(254, 238, 152, 0.13) 0%, rgba(78,205,196,0.11) 85%);
+    }
+    @media (max-width: 768px) {
+        .unzip-dropdown-menu {
+            right: 0;
+            left: auto;
+            min-width: 200px;
+            border-radius: 10px;
+            top: calc(100% + 5px);
+            padding: 0.61rem 0 0.41rem 0;
+        }
+        .unzip-menu-title {
+            font-size: 0.99rem;
+            padding: 0.58em 1em 0.32em 1.25em;
+        }
+        .unzip-dropdown-menu .unzip-menu-item {
+            font-size: 0.98rem;
+            padding: 0.47em 1.25em 0.48em 1.25em;
+        }
+    }
+    /** 其余样式无改动 **/
+    .hero {
+        min-height: 100vh;
+        padding: 15% 8% 8%;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        background:
+            radial-gradient(circle at 20% 30%, rgba(30, 58, 95, 0.6) 0%, transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(78, 205, 196, 0.4) 0%, transparent 40%),
+            var(--primary-dark);
+    }
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+            url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%234ECDC4" d="M50,0L0,50l50,50l50-50L50,0z M50,90L10,50l40-40l40,40L50,90z" opacity="0.05"/></svg>') center/60px 60px,
+            url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%235E8BFF" d="M50,0L0,50l50,50l50-50L50,0z M50,90L10,50l40-40l40,40L50,90z" opacity="0.05"/></svg>') center/40px 40px;
+        opacity: 0.4;
+        animation: particleMove 120s linear infinite;
+    }
+    @keyframes particleMove {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 100% 100%; }
+    }
+    .hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+    h1 {
+        font-size: clamp(2.8rem, 6vw, 4.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-teal) 80%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+    .subtitle {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        max-width: 680px;
+        margin-bottom: 3.5rem;
+        line-height: 1.6;
+    }
+    .tech-highlight {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        background: rgba(94, 139, 255, 0.15);
+        border-left: 3px solid var(--accent-blue);
+        color: var(--accent-teal);
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        position: relative;
+        cursor: pointer;
+    }
+    .popup-box {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 90%;
+        padding: 8px;
+        background: rgba(15, 26, 42, 0.95);
+        border: 1px solid rgba(94, 139, 255, 0.3);
+        border-radius: 8px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transform: translateY(10px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 10;
+    }
+    .popup-box img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        display: block;
+    }
+    .tech-highlight:hover .popup-box {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+    @media (max-width: 768px) {
+        .tech-highlight .popup-box { display: none !important; }
+    }
+    .social-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 3rem;
+    }
+    .social-links a {
+        min-width: 158px;
+        padding: 0.75rem 1.6rem;
+        background: linear-gradient(120deg, rgba(78, 205, 196, 0.13) 0%,rgba(94, 139, 255, 0.10) 100%);
+        border: 1.7px solid rgba(78,205,196,0.18);
+        border-radius: 8px;
+        color: var(--accent-teal);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.07rem;
+        transition: background 0.13s, color 0.13s, transform 0.14s, border-color 0.18s, box-shadow 0.13s;
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+        letter-spacing: 1.2px;
+        position: relative;
+        box-shadow: 0 3px 12px rgba(30, 58, 95, 0.09), 0 0.5px 5px rgba(78,205,196,0.08);
+        cursor: pointer;
+        overflow: hidden;
+    }
+    .social-links a:active {
+        background: linear-gradient(120deg, rgba(94,139,255,0.17) 0%,rgba(78, 205, 196, 0.13) 100%);
+        color: #fff;
+        transform: scale(0.97);
+        box-shadow: 0 0 0 transparent;
+    }
+    .social-links a .sweep-light {
+        pointer-events: none;
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        z-index: 2;
+        display: block;
+    }
+    .social-links a .sweep-light::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -30%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+            112deg,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.11) 47%,
+            rgba(94, 139, 255, 0.24) 55%,
+            rgba(255,255,255,0.10) 64%,
+            rgba(255,255,255,0) 100%
+        );
+        filter: blur(1px);
+        border-radius: 10px;
+        animation: sweep-light-anim 2.8s linear infinite;
+        opacity: 0.86;
+    }
+    .social-links a.sweep1 .sweep-light::before { animation-delay: 0s }
+    .social-links a.sweep2 .sweep-light::before { animation-delay: 0.7s }
+    .social-links a.sweep3 .sweep-light::before { animation-delay: 1.4s }
+    .social-links a.sweep4 .sweep-light::before { animation-delay: 2.1s }
+    @keyframes sweep-light-anim {
+        0% { left: -40%; opacity: 0.82; }
+        10% { opacity: 0.95;}
+        38% { left: 80%; opacity: 0.95; }
+        70% { left: 120%; opacity: 0; }
+        100% { left: 120%; opacity: 0;}
+    }
+    .social-links a.sim-hover .sweep-light,
+    .social-links a:hover .sweep-light {
+        display: none !important;
+    }
+    .social-links a::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+        background: radial-gradient(circle,rgba(94,139,255,0.18) 60%,transparent 100%);
+        transform: translate(-50%,-50%);
+        border-radius: 50%;
+        z-index: 0;
+        transition: width 0.45s cubic-bezier(.57,1.66,.16,.96),height 0.45s cubic-bezier(.57,1.66,.16,.96),opacity 0.19s;
+        opacity: 0;
+    }
+    .social-links a.sim-hover,
+    .social-links a:hover {
+        background: linear-gradient(120deg, rgba(78,205,196,0.23) 0%, rgba(94,139,255,0.13) 100%);
+        color: #fff;
+        border-color: var(--accent-teal);
+        box-shadow: 0 8px 32px rgba(78,205,196,0.14);
+        transform: translateY(-2.5px) scale(1.02);
+        z-index: 1;
+    }
+    .social-links a.sim-hover::before,
+    .social-links a:hover::before {
+        width: 300%;
+        height: 150%;
+        opacity: 1;
+    }
+    @media (max-width: 768px) {
+        .hero {
+            padding: 25% 5% 15%;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+        }
+        .social-links {
+            flex-direction: column;
+        }
+        .social-links a {
+            width: 100%;
+            text-align: center;
+            min-width: 80px;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.6rem;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .social-links .mobile-wechat-entry {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(100deg, var(--accent-yellow) 0%, var(--accent-green) 100%);
+            color: #222;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            border-radius: 8px;
+            min-width: 80px;
+            width: 100%;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+            margin-top: 1.0rem;
+            margin-bottom: 0.8rem;
+            border: none;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.17s;
+            cursor: pointer;
+            opacity: 0.55;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.6rem;
+            box-sizing: border-box;
+        }
+        .social-links .mobile-wechat-entry .wechat-icon {
+            width: 1.13em;
+            height: 1.13em;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.66em;
+        }
+        .social-links .mobile-wechat-entry:active {
+            background: linear-gradient(102deg, #ffe68d 0%, #b6fcb6 100%);
+            color: #333;
+            transform: scale(0.97);
+            opacity: 0.8;
+        }
+        .social-links .mobile-wechat-entry .entry-glow {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+            width:210%;
+            height:170%;
+            left: -55%;
+            top: -35%;
+            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 85%);
+            z-index: 0;
+            animation: entry-glow-anm 2.7s linear infinite;
+            border-radius: 8px;
+        }
+        @keyframes entry-glow-anm {
+            0% { opacity:0.65; left:-60%; top:-40%;}
+            50% { opacity:0.89; left:-35%; top:-20%;}
+            100% { opacity:0.65; left:-60%; top:-40%;}
+        }
+        .social-links .mobile-wechat-entry .entry-chevron {
+            display:inline-block;
+            margin-left: 0.29em;
+            transform: translateY(1px);
+            color: #6d5f14;
+            font-size: 1em;
+            text-shadow: 0 1px 7px rgba(255,255,255,0.10);
+        }
+    }
+    @media (min-width: 769px) {
+        .social-links .mobile-wechat-entry {
+            display: none !important;
+        }
+    }
+    .decor-element {
+        position: absolute;
+        z-index: 1;
+        opacity: 0.1;
+        animation: float 15s ease-in-out infinite;
+    }
+    .decor-element.la-style {
+        background: transparent;
+        border: 2px solid var(--accent-teal);
+        width: 100px;
+        height: 100px;
+    }
+    .decor-element.la-style:nth-child(2n) {
+        border-color: var(--accent-blue);
+    }
+    .decor-element.la-style.triangle {
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    }
+    .decor-element.la-style.diamond {
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    }
+    .decor-element.la-style.hexagon {
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    }
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(30px, 50px) rotate(5deg); }
+    }
+    .modal-mask {
+        position: fixed;
+        left: 0; top: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(25,42,70,0.28);
+        z-index: 999;
+    }
+    .custom-modal {
+        position: fixed;
+        left: 50vw;
+        top: 50vh;
+        transform: translate(-50%, -50%) scale(0.98);
+        width: 70vw;
+        max-width: 88vw;
+        min-width: 320px;
+        height: 600px;
+        max-height: 90vh;
+        background: linear-gradient(120deg, rgba(15,26,42,0.92) 60%, rgba(30,58,95,0.86) 100%);
+        box-shadow: 0 12px 60px 0 rgba(16,34,65,0.45);
+        border-radius: 16px;
+        border: 1.5px solid rgba(78,205,196,0.18);
+        z-index: 1000;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: modalBounceIn 0.33s;
+    }
+    @keyframes modalBounceIn {
+        0% { opacity:0; transform: translate(-50%, -40%) scale(0.8);}
+        60% { opacity:1; transform: translate(-50%, -52%) scale(1.06);}
+        85% { opacity:1; transform: translate(-50%, -48%) scale(0.98);}
+        100% { opacity:1; transform: translate(-50%, -50%) scale(1);}
+    }
+    .custom-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 36px 12px 32px;
+        background: linear-gradient(90deg, rgba(94,139,255,0.12) 0,rgba(78,205,196,0.03) 70%, transparent 100%);
+        min-height: 48px;
+        border-bottom: 1px solid rgba(94,139,255,0.09);
+    }
+    .custom-modal-title {
+        font-size: 1.33rem;
+        font-weight: bold;
+        background: linear-gradient(120deg, var(--text-primary), var(--accent-teal) 80%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 1px;
+    }
+    .custom-modal-close {
+        background: rgba(78,205,196,0.14);
+        border: none;
+        border-radius: 50%;
+        width: 34px; height: 34px;
+        font-size: 1.6rem;
+        color: var(--accent-teal);
+        transition: all 0.2s;
+        cursor: pointer;
+        position: relative;
+    }
+    .custom-modal-close:hover {
+        background: rgba(94,139,255,0.23);
+        color: #fff;
+    }
+    .custom-modal-content-wrap {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: transparent;
+    }
+    .custom-modal-content {
+        flex: 1 1 auto;
+        padding: 24px 32px 30px 32px;
+        color: var(--text-primary);
+        font-size: 1.13rem;
+        line-height: 2.05;
+        overflow-y: auto;
+        background: linear-gradient(120deg, rgba(15,26,42,0.68) 60%, rgba(30,58,95,0.46) 100%);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        min-height: 0;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-teal) rgba(30,45,60,0.23);
+    }
+    .custom-modal-content::-webkit-scrollbar {
+        width: 8px;
+    }
+    .custom-modal-content::-webkit-scrollbar-thumb {
+        background: var(--accent-teal);
+        border-radius: 6px;
+    }
+    .custom-modal-content::-webkit-scrollbar-track {
+        background: rgba(30,45,60,0.08);
+    }
+    .custom-modal-footer-spacer {
+        width: 100%;
+        min-height: 32px;
+        height: 32px;
+        background: transparent;
+    }
+    .phone-modal-mask {
+        position: fixed;
+        top:0;
+        left:0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.22);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .phone-modal-box {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 28px 18px 18px 18px;
+        box-shadow: 0 8px 32px rgba(78,205,196,0.22), 0 0 2px rgba(0,0,0,0.08);
+        min-width: 260px;
+        max-width: 88vw;
+        width: 320px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .phone-modal-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--accent-blue);
+        text-shadow: 0 2px 10px rgba(78,205,196,0.04);
+        letter-spacing: 1px;
+    }
+    .phone-modal-number {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: var(--accent-teal);
+        margin: 10px 0 16px 0;
+        letter-spacing: 1px;
+        font-family: "微软雅黑", "Microsoft YaHei", "黑体", "SimHei", "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+    @media (max-width: 900px) {
+        .phone-modal-number {
+            font-family: "黑体","SimHei","微软雅黑", "Microsoft YaHei", "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-weight: bold;
+        }
+    }
+    .phone-modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        margin-top: 18px;
+        width: 100%;
+    }
+    .phone-modal-btn {
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 32px;
+        cursor: pointer;
+        background: var(--accent-teal);
+        color: #fff;
+        font-weight: 600;
+        margin: 0 2px;
+        box-shadow: 0 2px 10px rgba(30, 58, 95, 0.06);
+        transition: background 0.16s,color 0.16s;
+    }
+    .phone-modal-btn.cancel {
+        background: #b8d8ff;
+        color: #1e293b;
+    }
+    .phone-modal-btn.sms {
+        background: var(--accent-blue);
+        color: #fff;
+    }
+    .phone-modal-close-x {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 1.48rem;
+        color: var(--accent-blue);
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .wechat-modal-mask {
+        position: fixed;
+        left:0; top:0; width:100vw; height:100vh;
+        z-index: 10001;
+        background: rgba(20,36,50,0.26);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .wechat-modal-box {
+        background: #142642;
+        padding: 2em 1.2em 1.2em 1.2em;
+        border-radius: 20px;
+        border:1.6px solid rgba(65,250,200,0.21);
+        box-shadow: 0 12px 60px 0 rgba(16,34,65,0.45);
+        position: relative;
+        min-width: 0;
+        max-width: 92vw;
+        width: 340px;
+        color: #f8fdff;
+    }
+    .wechat-modal-box .wechat-modal-title {
+        font-size: 1.0em;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        margin-bottom: 1.1em;
+        text-align: center;
+        color: var(--accent-green, #7dfb7d);
+        text-shadow: 0 1px 10px #67fcb67b;
+    }
+    .wechat-modal-box .wechat-modal-qr {
+        display: block;
+        width: calc(80vw - 1.4em);
+        max-width: 280px;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 0;
+        margin-top: 0.2em;
+        border-radius: 14px;
+        background: #142642;
+        outline: none;
+        box-shadow: 0 2px 8px #17213a55;
+        padding: 0;
+    }
+    .wechat-modal-box {
+        padding-bottom: 1.2em;
+        padding-left: 1.2em;
+        padding-right: 1.2em;
+    }
+    .wechat-modal-close-x {
+        position: absolute;
+        top: 10px;
+        right: 16px;
+        font-size: 1.7em;
+        background: none;
+        border: none;
+        color: #83fc7a;
+        cursor: pointer;
+        transition:.13s;
+        z-index:2;
+    }
+    .wechat-modal-close-x:hover { color:#ffe274; }
+    .wechat-modal-box .wechat-modal-qr {
+        margin-bottom: 0 !important;
+    }
+    @media (max-width: 440px) {
+        .wechat-modal-box { width: 88vw; min-width: 0; padding-left: 8vw; padding-right: 8vw;}
+        .wechat-modal-box .wechat-modal-qr { max-width: 88vw; }
+    }
+    .wechat-modal-box { animation: wechatzoom 0.3s; }
+    @keyframes wechatzoom {
+        0% { transform: scale(0.72); opacity:0; }
+        65% { transform: scale(1.11) rotate(-2deg); opacity:1;}
+        100% { transform: scale(1); }
+    }
+    </style>
+</head>
+<body>
+    <header class="nav-container">
+        <nav>
+            <a href="#" class="logo">
+                <img src="logo.png" alt="LUODA Logo">
+            </a>
+            <div class="nav-links" style="position:relative;">
+                <a href="https://median.co/share/mpzpnw" class="nav-qrcode-btn nav-btn-base" id="nav-qrcode-btn" target="_blank" rel="noopener">
+                    <span class="icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" width="1em" height="1em" fill="none"><rect x="4" y="2" width="12" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="16" r="1.1" fill="currentColor"/></svg>
+                    </span>
+                    APP下载
+                    <span class="sweep-light"></span>
+                </a>
+                <a href="javascript:void(0);" class="nav-app-btn nav-btn-base" id="nav-app-btn">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <rect x="3.1" y="3.1" width="5.8" height="5.8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                          <rect x="15.1" y="3.1" width="5.8" height="5.8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                          <rect x="3.1" y="15.1" width="5.8" height="5.8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                          <rect x="9.9" y="9.9" width="4.2" height="4.2" rx="0.8" stroke="currentColor" stroke-width="1.3"/>
+                          <rect x="15.9" y="15.9" width="2.2" height="2.2" rx="0.5" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    扫码下载
+                    <span class="sweep-light"></span>
+                </a>
+                <a href="javascript:void(0);" class="nav-wechat-btn nav-btn-base" id="nav-wechat-btn">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                            <ellipse cx="11" cy="11" rx="10" ry="10" stroke="currentColor" stroke-width="1.6" fill="none"/>
+                            <ellipse cx="14.5" cy="13" rx="4" ry="3.7" stroke="currentColor" stroke-width="1.1" fill="none"/>
+                            <ellipse cx="7.3" cy="8.9" rx="4" ry="4" stroke="currentColor" stroke-width="1.1" fill="none"/>
+                            <circle cx="8.2" cy="11" r="0.56" fill="currentColor"/>
+                            <circle cx="13.2" cy="14.4" r="0.64" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    添加微信
+                    <span class="sweep-light"></span>
+                </a>
+                <!-- PC端“解压游戏”按钮，紧挨添加微信右侧 -->
+                <div style="position:relative;display:inherit;">
+                <button type="button" class="nav-btn-base nav-unzip-btn-pc" id="nav-unzip-btn-pc" aria-haspopup="true" aria-expanded="false" style="margin-left:0.3rem;">
+                    <span class="icon">
+                        <svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="3.8" y="3.8" width="14.4" height="14.4" rx="4.2" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="7.5" y="7.5" width="7" height="7" rx="2" fill="currentColor" opacity=".18" /><rect x="7.5" y="7.5" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.12" /></svg>
+                    </span>
+                    解压游戏
+                    <span class="sweep-light"></span>
+                </button>
+                <div class="unzip-dropdown-menu" id="unzip-dropdown-pc" tabindex="-1">
+
+                    <button class="unzip-menu-item" id="unzip-menu-bee-pc">蜜蜂大冒险</button>
+                    <button class="unzip-menu-item" id="unzip-menu-shuzhi-pc">数字滑块拼图</button>
+                    <button class="unzip-menu-item" id="unzip-menu-100-pc">AI算命</button>
+                    <button class="unzip-menu-item" id="unzip-menu-fangkuai-pc">AI成语方块消消乐</button>
+                </div>
+                </div>
+                <!-- 手机端“解压游戏”替换“联系我们”，独立样式 -->
+                <div style="position:relative;display:inherit;">
+                <button type="button" class="nav-unzip-btn-mobile" id="nav-unzip-btn-mobile" aria-haspopup="true" aria-expanded="false" style="display:none;">
+                    <span class="icon">
+                        <svg width="21" height="21" viewBox="0 0 22 22" fill="none"><rect x="3.8" y="3.8" width="14.4" height="14.4" rx="4.2" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="7.5" y="7.5" width="7" height="7" rx="2" fill="currentColor" opacity=".18" /><rect x="7.5" y="7.5" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.12" /></svg>
+                    </span>
+                    解压游戏
+                    <span class="sweep-light"></span>
+                </button>
+                <div class="unzip-dropdown-menu" id="unzip-dropdown-mobile" tabindex="-1">
+
+                    <button class="unzip-menu-item" id="unzip-menu-bee-mobile">蜜蜂大冒险</button>
+                    <button class="unzip-menu-item" id="unzip-menu-shuzhi-mobile">数字滑块拼图</button>
+                    <button class="unzip-menu-item" id="unzip-menu-100-mobile">AI算命</button>
+                    <button class="unzip-menu-item" id="unzip-menu-fangkuai-mobile">AI成语方块消消乐</button>
+
+                </div>
+                </div>
+                <a href="javascript:void(0);" class="contact-btn" id="nav-contact-btn">
+                    联系我们
+                    <span class="sweep-light"></span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    <section class="hero">
+        <div class="decor-element la-style triangle" style="top: 10%; left: 5%; width: 80px; height: 80px;"></div>
+        <div class="decor-element la-style diamond" style="top: 70%; left: 80%; width: 120px; height: 120px;"></div>
+        <div class="decor-element la-style hexagon" style="top: 30%; left: 75%; width: 60px; height: 60px;"></div>
+        <div class="decor-element la-style triangle" style="top: 80%; left: 15%; width: 100px; height: 100px;"></div>
+        <div class="decor-element la-style diamond" style="top: 20%; left: 85%; width: 50px; height: 50px;"></div>
+        <div class="hero-content">
+            <div class="tech-highlight" id="phone-highlight">
+                <span id="highlight-text">LUODA | AI工程设计创新者 17373913119</span>
+                <div class="popup-box" id="phone-popup-box">
+                    <img src="lx.png" alt="AI工程设计">
+                </div>
+            </div>
+            <h1>创新AI赋能<br>提速1000%高效出图交付</h1>
+            <p class="subtitle">
+                融合AI参数化设计，实现从现有条件到施工图全专业全流程作业。<br>
+                工程可行性研究/方案设计/初步设计/施工图 全过程无缝协作。
+            </p>
+            <div class="social-links" id="sim-social-links">
+                <a href="#bim" class="modal-trigger sweep1" data-modal="drainage">
+                    智慧给排水管网
+                    <span class="sweep-light"></span>
+                </a>
+                <a href="#carbon" class="modal-trigger sweep2" data-modal="water">
+                    智慧水利工程
+                    <span class="sweep-light"></span>
+                </a>
+                <a href="#collaborate" class="modal-trigger sweep3" data-modal="agri">
+                    新智慧农村农业
+                    <span class="sweep-light"></span>
+                </a>
+                <a href="#specs" class="modal-trigger sweep4" data-modal="traffic">
+                    智能交通AI赋能
+                    <span class="sweep-light"></span>
+                </a>
+                <a href="javascript:void(0);" class="mobile-wechat-entry" id="wechat-qr-entry" style="display:none;">
+                    <span class="entry-glow"></span>
+                    <span class="wechat-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                            <ellipse cx="11" cy="11" rx="10" ry="10" stroke="currentColor" stroke-width="1.6" fill="none"/>
+                            <ellipse cx="14.5" cy="13" rx="4" ry="3.7" stroke="currentColor" stroke-width="1.1" fill="none"/>
+                            <ellipse cx="7.3" cy="8.9" rx="4" ry="4" stroke="currentColor" stroke-width="1.1" fill="none"/>
+                            <circle cx="8.2" cy="11" r="0.56" fill="currentColor"/>
+                            <circle cx="13.2" cy="14.4" r="0.64" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    微信快速联系
+                    <span class="entry-chevron">▶</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hero = document.querySelector('.hero');
+        const shapes = ['triangle', 'diamond', 'hexagon'];
+        const colors = ['var(--accent-teal)', 'var(--accent-blue)'];
+        if (window.innerWidth > 768) {
+            for (let i = 0; i < 8; i++) {
+                const element = document.createElement('div');
+                element.className = `decor-element la-style ${shapes[Math.floor(Math.random() * shapes.length)]}`;
+                const size = Math.random() * 60 + 40;
+                const posX = Math.random() * 90;
+                const posY = Math.random() * 90;
+                const delay = Math.random() * 5;
+                const duration = 15 + Math.random() * 15;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                element.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    top: ${posY}% ;
+                    left: ${posX}% ;
+                    border-color: ${color};
+                    opacity: ${Math.random() * 0.1 + 0.05};
+                    animation: float ${duration}s ease-in-out ${delay}s infinite;
+                `;
+                hero.appendChild(element);
+            }
+        }
+        function isMobile() { return window.innerWidth <= 768; }
+        const modalContents = {
+            drainage: {
+                title: '智慧给排水管网',
+                content: `<p>在现代城市的发展进程中，智慧给排水管网的设计已经成为城市基础设施智能化、精细化管理的核心组成部分。融合 AI 参数化设计与 BIM（建筑信息模型）技术，智慧给排水管网不仅追求系统规划的高效性，更注重数据的实时交互与运维的便捷性。</p>
+      <p>首先，智慧给排水管网设计强调“全流程数字化”，通过 AI 算法分析城市地形、建筑布局、人口密度及气候条件等多维数据，实现管网线路布置的智能优化。设计过程中，系统会自动推荐最优的管道走向，自动避让障碍物，避免二次开挖和资源浪费。同时能够实时检测各类规范冲突（如坡度、水力平衡等），确保系统的安全运行和后期维护的便利。</p>
+      <p>其次，智慧给排水设计突破了传统以经验为主的设计范式，利用物联网设备采集的流量、水质、压力等实时数据，反哺设计过程。AI 可以对管网中存在的薄弱环节进行预判，对流域内的易涝点、排水瓶颈进行主动识别，全面提升系统的抗灾能力。对于多雨地区，通过模拟极端天气下的排水能力，辅助制定最佳雨洪管控策略，实现“未雨绸缪”，减少城市内涝风险。</p>
+      <p>在协同设计方面，智慧管网系统支持多专业、多角色协作，设计师、施工方、运维方可在同一平台上实时沟通、共享设计成果，高效推进项目进度。参数化出图功能能自动生成高质量的 2D/3D 工程图纸和材料清单，极大地减少手工绘制、反复核对的工作量，在项目各阶段均可通过 BIM 模型直观校验空间碰撞及施工可行性。</p>
+      <p>此外，智慧给排水系统还能打通前期规划、主干管道设计、分支接入、阀门泵站布设、检修井管理等全链路，提供从用水预测到能耗分析的全面服务。通过智能模拟未来城市发展带来的流量变化，提前规避未来隐患。依靠大数据分析与人工智能，系统可自动捕捉最新规范变化，为项目迭代和监管提供持续动力。</p>
+      <p>智慧给排水工程的最终目标，是打造高效能、可持续、低碳化的城市水循环体系，在节能降耗、绿色环保方面持续创新。通过智能运维平台，相关管理人员可在手机端随时掌握管网运行状况，第一时间响应突发事件，推动城市水环境管理向更高阶跃升。</p>
+    </div>`
+            },
+            water: {
+                title: '智慧水利工程',
+                content: `<p>智慧水利工程的设计是以信息化、数字化、智能化为引领，将 AI 及云计算、大数据、物联网等技术深度融合至传统水利工程全生命周期。目前，智慧水利工程的创新体现在规划、勘测、分析、设计、施工及管理等多环节的协同驱动。</p>
+      <p>智能规划阶段，系统可集成遥感、地理信息系统（GIS）、水文水动力模拟等多维数据，对流域的水资源状况、地形地貌、降雨分布及历史洪水记录进行深入分析。AI 算法可以自动识别河流、水库、泵站、闸坝等重要设施的最优布局位置，高效生成可行性研究报告及初步设计方案，并对多种调度情景进行敏感性分析，为科学决策提供强大支撑。</p>
+      <p>在设计环节，智慧水利工程利用参数化建模，通过设置多元变量（如水位、流速、流量、水质指标等），实现全工艺流程自动推演。AI 可自动校核各类规范约束，自动调整方案以适配复杂地形和突发工况。三维 BIM 模型贯穿方案、初设、施工图阶段，自动生成三维水利实体，便于直观展示和施工图的高效出图，各专业如结构、电气、自控与水工建筑同步协作，极大提升跨专业设计的协同水平。</p>
+      <p>智慧水利强调实时数据驱动的设计。借助 IoT 感知系统获取实时流域水情信息，实行“数字孪生水利”，即将现状与仿真模型完全对接。对异常天气、极端水位变化、调度操作进行高精度模拟与应急预案自动生成，实现水库调洪、泵站联动、闸坝调度的全智能管控。</p>
+      <p>智能设计平台还可以对绿色低碳材料选择、工程构件模数化、标准化进行辅助，最大限度节省资源和能耗。对于超大规模工程，系统能自动生成进度计划、物资需求、造价统计等，为投资控制和后续运维提供数据保障。</p>
+      <p>通过统一的智慧水利管理平台，项目各方可随时掌握工程进展状态及设计数据。数据全生命周期可追溯、可审计，为水利行业的数字化转型提供坚实基础。最终，智慧水利工程力求实现安全高效、绿色环保、生态友好与智能化运维四位一体的目标，推动我国水利工程全面迈入智慧时代。</p>`
+            },
+            agri: {
+                title: '新智慧农村农业',
+                content: `<p>新智慧农村农业设计以推动农村现代化、促进农业可持续发展为核心，将AI大模型、物联网（IoT）、卫星遥感及自动化装备等最新技术全面融入农村基础设施与农田水利工程中，实现从顶层规划到执行的深度智能化。</p>
+      <p>首先在前期规划阶段，通过遥感影像分析、地形建模和土壤数据采集，AI系统能够对耕地、林地、水体、道路等农村空间资源进行精细划分和动态评估，自动生成最优灌排分区和基础设施布局，大幅提升土地及水资源的集约利用效率。参数化算法能够根据不同作物、轮作方式、土壤肥力与水源条件定制农田水利方案，实现精准灌溉和智能排涝，显著提高农业产能与抗风险能力。</p>
+      <p>在农田水利智能设计上，平台结合物联网传感网络，实现土壤墒情、天气预报、作物长势和地下水位等关键数据的自动采集。系统据此自动调整管道、渠道、泵站和水闸等基础设施尺寸与布局，对农田灌溉方案进行优化。AI驱动的模拟引擎对极端降雨、病虫害、水源短缺等多种情景下的农田水利系统安全运行能力进行复合预判，并可一键生成多种应急预案，为农村农业稳定生产保驾护航。</p>
+      <p>在协同设计方面，新智慧农村农业平台支持多部门、多角色同时在线协作，农技人员、设计师、水利工程师、农户等可共同参与项目论证和方案调整。所有设计环节均通过BIM+GIS系统管理，自动生成农田管网2D/3D图纸、材料清单及预算报表，极大降低传统手工操作和审核风险，并便于日后运维。</p>
+      <p>智能平台更加注重可持续和绿色发展。设计过程自动优化用水效率和资源消耗，推动灌溉用水定额、节水型设备与新能源泵站集成应用。农业废弃物回收、农村污水治理与生态修复等内容借助AI智能推荐融入初步设计与改造升级，实现农村环保与资源循环高效协同。</p>
+      <p>最终，新智慧农村农业设计系统实现了农村基础设施数字化、智能化全覆盖。项目建成后，管理人员可在移动端随时查看设施状态，远程下达操作指令，快速响应环境和农情变化。不仅极大提升农业生产效率和农村生活质量，还为乡村振兴和农业现代化提供了坚强技术保障，助力中国农村走向智慧绿色的新征程。</p>`
+            },
+            traffic: {
+                title: '智能交通AI赋能',
+                content: `<p>智能交通AI赋能设计，是数字化与智慧城市背景下城市道路交通基础设施升级的核心。基于大数据、AI、BIM和多源感知技术，智能交通的设计不仅关注道路本身，更注重于全路网、全场景、全要素的智能协同与管理，从根本上提升交通系统的运行效率、安全水平与可持续发展能力。</p>
+      <p>在系统规划与布线设计方面，智能交通通过AI算法对城市路网结构、交通流量历史、出行行为模式和突发事件进行深度分析，结合卫星地图与实时路况数据，自动识别瓶颈路段、高风险节点与拥堵区域。平台可自动生成最优的道路扩容、节点信号优化和立体交通集散方案，形成科学高效的智慧交通顶层设计。</p>
+      <p>设计环节采用BIM（三维建模）与参数化工具，支持道路主干线、辅路、交叉口、公交专用道、智能停车场、慢行设施等多要素一体化设计。对信号灯配时、隔离带、交通标志标线、立体交叉设计、非机动车与行人安全通道等关键设施，AI可自动审核规范冲突，输出符合国标与实际需求的施工图纸。智能交通系统还能根据不同路段特点，动态分配车道、自动调整限速、响应拥堵预警，极大提升道路通行效率。</p>
+      <p>调度与管控层面，智能交通平台集成物联网信号采集设备，对交通流量、拥堵指数、事故预警、气象数据等信息进行实时收集与AI联动分析。系统对突发事件（如恶劣天气、重大活动、交通事故）可自动生成应急分流和调度预案，指挥中心可通过数字孪生可视化平台“一图统管”全市交通态势，实施自动信号联控、可变限速、智能诱导等智能调度。</p>
+      <p>跨部门协同设计也是智能交通的亮点。市政、交警、公交、应急等多方可在平台上共同参与方案论证和图纸校审，实时共享规划成果。BIM模型多专业协同与时空信息一体化管理，全面降低反复修订带来的滞后和误差，加快项目从方案到竣工的全流程转化速度，实现设计成果的高效落地。</p>
+      <p>最终，智能交通AI赋能为交通基础设施建设、城市管理、公众出行带来革命性提升。它不仅助力城市实现“绿色、智能、便捷、畅通”的交通愿景，还为减排降耗、环境友好和全域数字政府治理提供坚实技术底座，为智慧城市高速发展注入源源不断的创新动力。</p>`
+            }
+        };
+        const appDownloadQrUrl = "app-qr.png";
+        function showQrModal(title, qrImg) {
+            if(document.querySelector('.wechat-modal-mask')) return;
+            const mask = document.createElement('div');
+            mask.className = "wechat-modal-mask";
+            mask.innerHTML = `
+              <div class="wechat-modal-box" role="dialog" aria-modal="true">
+                <button class="wechat-modal-close-x" aria-label="关闭弹窗">&times;</button>
+                <div class="wechat-modal-title">${title}</div>
+                <img src="${qrImg}" alt="二维码" class="wechat-modal-qr"/>
+              </div>
+            `;
+            mask.querySelector('.wechat-modal-close-x').onclick = remove;
+            function remove() { if(mask.parentNode) mask.parentNode.removeChild(mask);}
+            mask.addEventListener('click', function(e){ if(e.target === mask) remove(); });
+            function escClose(e){ if (document.body.contains(mask) && (e.key === "Escape" || e.key === "Esc")) {remove();}}
+            document.addEventListener('keydown',escClose); mask.esc = escClose;
+            document.body.appendChild(mask);
+        }
+        function showWechatQRModal() {
+            showQrModal('微信扫码添加好友', 'lx.png');
+        }
+        function showAppQRModal() {
+            showQrModal('扫码下载APP', appDownloadQrUrl);
+        }
+        function closeModal() {
+            let mask = document.querySelector('.modal-mask');
+            let modal = document.querySelector('.custom-modal');
+            if(mask) mask.parentNode.removeChild(mask);
+            if(modal) modal.parentNode.removeChild(modal);
+            document.body.style.overflow = "";
+        }
+        function openModal(key) {
+            if(window.innerWidth <= 768) return;
+            closeModal();
+            let mask = document.createElement('div');
+            mask.className = 'modal-mask';
+            let modal = document.createElement('div');
+            modal.className = 'custom-modal';
+            modal.innerHTML = `
+              <div class="custom-modal-header">
+                  <span class="custom-modal-title">${modalContents[key].title}</span>
+                  <button class="custom-modal-close" aria-label="关闭" title="关闭弹窗">&times;</button>
+              </div>
+              <div class="custom-modal-content-wrap">
+                <div class="custom-modal-content">
+                    ${modalContents[key].content}
+                </div>
+                <div class="custom-modal-footer-spacer"></div>
+              </div>
+            `;
+            modal.querySelector('.custom-modal-close').onclick = closeModal;
+            mask.onclick = function(e){
+                if(e.target === mask){ closeModal(); }
+            };
+            modal.onclick = function(e){ e.stopPropagation(); };
+            document.body.appendChild(mask);
+            document.body.appendChild(modal);
+            document.body.style.overflow='hidden';
+        }
+        function showPhoneDialog(number) {
+            const existed = document.querySelector('.phone-modal-mask');
+            if (existed) existed.remove();
+            const mask = document.createElement('div');
+            mask.className = 'phone-modal-mask';
+            mask.innerHTML = `
+                <div class="phone-modal-box" role="dialog" aria-modal="true" aria-labelledby="phonedialog-title">
+                    <button class="phone-modal-close-x" aria-label="关闭弹窗">&times;</button>
+                    <div class="phone-modal-title" id="phonedialog-title">委托设计联系我</div>
+                    <div class="phone-modal-number"><b>${number}</b></div>
+                    <div class="phone-modal-actions">
+                        <a class="phone-modal-btn confirm" href="tel:${number}" style="text-decoration:none;">电话</a>
+                        <a class="phone-modal-btn sms" href="sms:${number}" style="text-decoration:none;">短信</a>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(mask);
+            function closeFn() { if (mask && mask.parentNode) mask.parentNode.removeChild(mask);}
+            mask.querySelector('.phone-modal-close-x').onclick = closeFn;
+            mask.addEventListener('click', function(e){ if (e.target === mask) closeFn(); });
+            function escClose(e){ if (document.body.contains(mask) && (e.key === "Escape" || e.key === "Esc")) closeFn();}
+            document.addEventListener('keydown', escClose);
+            mask.maskEscListener = escClose;
+        }
+        var phoneNumber = "17373913119";
+        var socialLinkBtns = document.querySelectorAll('.social-links .modal-trigger');
+        socialLinkBtns.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    showPhoneDialog(phoneNumber);
+                } else {
+                    e.preventDefault();
+                    openModal(this.getAttribute('data-modal'));
+                }
+            });
+        });
+        document.querySelectorAll('.nav-links .modal-trigger').forEach(link=>{
+            link.addEventListener('click', function(e){
+                e.preventDefault();
+                openModal(this.getAttribute('data-modal'));
+            });
+        });
+        var phoneHighlight = document.getElementById('phone-highlight');
+        var highlightText = document.getElementById('highlight-text');
+        var popupBox = document.getElementById('phone-popup-box');
+        var normalText = "LUODA | AI工程设计创新者 17373913119";
+        var hoverText = "请打开微信扫描以上二维码，添加好友！";
+        function handleHover(e){
+            if (!(window.innerWidth <= 768)) highlightText.innerText = hoverText;
+        }
+        function handleMouseLeave(e){
+            if (!(window.innerWidth <= 768)) highlightText.innerText = normalText;
+        }
+
+        function setHighlightListeners() {
+            if(phoneHighlight && highlightText){
+                phoneHighlight.removeEventListener('mouseenter', handleHover);
+                phoneHighlight.removeEventListener('mouseleave', handleMouseLeave);
+                phoneHighlight.removeEventListener('click', mobileClickHandler);
+                if (popupBox) popupBox.style.display = '';
+                if (!(window.innerWidth <= 768)) {
+                    if (popupBox) popupBox.style.display = '';
+                    phoneHighlight.addEventListener('mouseenter', handleHover);
+                    phoneHighlight.addEventListener('mouseleave', handleMouseLeave);
+                    phoneHighlight.onclick = null;
+                } 
+                else {
+                    if (popupBox) popupBox.style.display = 'none';
+                    highlightText.innerText = normalText;
+                    phoneHighlight.onclick = mobileClickHandler;
+                }
+            }
+        }
+        function mobileClickHandler(e){
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                showPhoneDialog(phoneNumber);
+            }
+        }
+        setHighlightListeners();
+        window.addEventListener('resize', function() { setHighlightListeners(); });
+        document.addEventListener('keydown', function(e){
+            if(e.key==='Escape') closeModal();
+        });
+        window.addEventListener('resize', closeModal);
+
+        function addBtnHoverEffect(btns) {
+            btns.forEach(btn => {
+                btn.addEventListener('mouseenter', ()=>{btn.classList.add('sim-hover');});
+                btn.addEventListener('mouseleave', ()=>{btn.classList.remove('sim-hover');});
+                btn.addEventListener('touchstart', ()=>{
+                    btns.forEach(b=>b.classList.remove('sim-hover'));
+                    btn.classList.add('sim-hover');
+                });
+                btn.addEventListener('touchend', ()=>{
+                    setTimeout(()=>{btn.classList.remove('sim-hover')}, 1500);
+                });
+            });
+        }
+        const simBtnsContainer = document.getElementById('sim-social-links');
+        const simBtns = Array.from(simBtnsContainer.querySelectorAll('a:not(.mobile-wechat-entry)'));
+        addBtnHoverEffect(simBtns);
+        simBtns.forEach((btn, idx)=>{
+            btn.classList.remove("sweep1","sweep2","sweep3","sweep4");
+            btn.classList.add("sweep"+(idx+1));
+        });
+        var navContactBtn = document.getElementById('nav-contact-btn');
+        function bindContactBtnEvt() {
+            if(navContactBtn){
+                if(window.innerWidth <= 768) {
+                    addBtnHoverEffect([navContactBtn]);
+                    navContactBtn.addEventListener('click', function(e){
+                        e.preventDefault();
+                        showPhoneDialog(phoneNumber);
+                    });
+                }else{
+                    navContactBtn.removeEventListener('click', function(e){
+                        e.preventDefault();
+                        showPhoneDialog(phoneNumber);
+                    });
+                }
+            }
+        }
+        bindContactBtnEvt();
+        window.addEventListener('resize', bindContactBtnEvt);
+        function resetContactBtnSweepLight() {
+            var contactBtn = document.getElementById('nav-contact-btn');
+            if (!contactBtn) return;
+            if (!contactBtn.querySelector('.sweep-light')) {
+                var span = document.createElement('span');
+                span.className = 'sweep-light';
+                contactBtn.appendChild(span);
+            }
+        }
+        resetContactBtnSweepLight();
+        window.addEventListener('resize', resetContactBtnSweepLight);
+        function refreshMobileWechatEntry() {
+            var entry = document.getElementById('wechat-qr-entry');
+            if (!entry) return;
+            if(window.innerWidth <= 768) entry.style.display = 'flex';
+            else entry.style.display = 'none';
+        }
+        refreshMobileWechatEntry();
+        window.addEventListener('resize', refreshMobileWechatEntry);
+        var wechatEntryBtn = document.getElementById('wechat-qr-entry');
+        if (wechatEntryBtn) {
+            wechatEntryBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if(window.innerWidth <= 768) showWechatQRModal();
+            });
+        }
+        var navWechatBtn = document.getElementById('nav-wechat-btn');
+        function navWechatBtnBindEvt() {
+            if (!navWechatBtn) return;
+            if(window.innerWidth > 768) {
+                addBtnHoverEffect([navWechatBtn]);
+                navWechatBtn.onclick = function(e){
+                    e.preventDefault();
+                    showWechatQRModal();
+                }
+            } else {
+                navWechatBtn.onclick = null;
+            }
+        }
+        navWechatBtnBindEvt();
+        window.addEventListener('resize', navWechatBtnBindEvt);
+        var navAppBtn = document.getElementById('nav-app-btn');
+        function navAppBtnBindEvt() {
+            if (!navAppBtn) return;
+            if(window.innerWidth > 768) {
+                addBtnHoverEffect([navAppBtn]);
+                navAppBtn.onclick = function(e){
+                    e.preventDefault();
+                    showAppQRModal();
+                }
+            } else {
+                navAppBtn.onclick = null;
+            }
+        }
+        navAppBtnBindEvt();
+        window.addEventListener('resize', navAppBtnBindEvt);
+        var navQrcodeBtn = document.getElementById('nav-qrcode-btn');
+        function navQrcodeBtnBindEvt() {
+            if (!navQrcodeBtn) return;
+            addBtnHoverEffect([navQrcodeBtn]);
+        }
+        navQrcodeBtnBindEvt();
+        window.addEventListener('resize', navQrcodeBtnBindEvt);
+
+        // ######## 解压游戏按钮JS #########
+        function showUnzipMenu(type) {
+            if(type === 'pc') {
+                let menu = document.getElementById('unzip-dropdown-pc');
+                if (menu.classList.contains('show')) {
+                    hideUnzipMenu('pc');
+                    return;
+                }
+                hideUnzipMenu('mobile');
+                menu.classList.add('show');
+                document.getElementById('nav-unzip-btn-pc').setAttribute('aria-expanded', 'true');
+                setTimeout(()=>{if(menu) menu.focus();},20);
+            } else {
+                let menu = document.getElementById('unzip-dropdown-mobile');
+                if (menu.classList.contains('show')) {
+                    hideUnzipMenu('mobile');
+                    return;
+                }
+                hideUnzipMenu('pc');
+                menu.classList.add('show');
+                document.getElementById('nav-unzip-btn-mobile').setAttribute('aria-expanded', 'true');
+                setTimeout(()=>{if(menu) menu.focus();},20);
+            }
+        }
+        function hideUnzipMenu(type) {
+            if(type==='pc') {
+                let menu = document.getElementById('unzip-dropdown-pc');
+                menu.classList.remove('show');
+                document.getElementById('nav-unzip-btn-pc').setAttribute('aria-expanded', 'false');
+            } else {
+                let menu = document.getElementById('unzip-dropdown-mobile');
+                menu.classList.remove('show');
+                document.getElementById('nav-unzip-btn-mobile').setAttribute('aria-expanded', 'false');
+            }
+        }
+        // 跳转页面
+        function goToBeeGame() {
+            window.location.href = 'mifeng.html';
+        }
+        function goToShuzhiGame() {
+            window.location.href = 'shuzhi.html';
+        }
+
+        function goTo100Game() {
+            window.location.href = '100qian.html';
+        }
+        function goTofangkuaiGame() {
+            window.location.href = 'fangkuai.html';
+        }
+
+        // PC端事件
+        var pcBtn = document.getElementById('nav-unzip-btn-pc');
+        var pcMenu = document.getElementById('unzip-dropdown-pc');
+        if(pcBtn && pcMenu) {
+            addBtnHoverEffect([pcBtn]);
+            // click切换菜单
+            pcBtn.addEventListener('click', function(e){
+                e.preventDefault();
+                if(isMobile()) return;
+                showUnzipMenu('pc');
+            });
+            // 菜单项点击跳转
+            document.getElementById('unzip-menu-bee-pc').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('pc');
+                goToBeeGame();
+            };
+            document.getElementById('unzip-menu-shuzhi-pc').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('pc');
+                goToShuzhiGame();
+            };
+            document.getElementById('unzip-menu-100-pc').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('pc');
+                goTo100Game();
+            };
+            document.getElementById('unzip-menu-fangkuai-pc').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('pc');
+                goTofangkuaiGame();
+            };
+            // 点击外部关闭菜单
+            document.addEventListener('mousedown', function(e){
+                if(!isMobile() && pcMenu.classList.contains('show')) {
+                    if(!pcMenu.contains(e.target) && !pcBtn.contains(e.target)) {
+                        hideUnzipMenu('pc');
+                    }
+                }
+            });
+            // ESC关闭
+            document.addEventListener('keydown',function(e){
+                if(e.key === 'Escape' && pcMenu.classList.contains('show')) {
+                    hideUnzipMenu('pc');
+                    pcBtn.blur();
+                }
+            });
+            // 菜单失焦关闭
+            pcMenu.addEventListener('blur',function(){
+                setTimeout(()=>{hideUnzipMenu('pc');},100);
+            });
+        }
+
+        // 手机端事件
+        var mobileBtn = document.getElementById('nav-unzip-btn-mobile');
+        var mobileMenu = document.getElementById('unzip-dropdown-mobile');
+        function setMobileUnzipBtnVisibility() {
+            if(isMobile()) mobileBtn.style.display = 'flex';
+            else mobileBtn.style.display = 'none';
+        }
+        setMobileUnzipBtnVisibility();
+        window.addEventListener('resize', setMobileUnzipBtnVisibility);
+
+        if(mobileBtn && mobileMenu) {
+            addBtnHoverEffect([mobileBtn]);
+            mobileBtn.addEventListener('click',function(e){
+                e.preventDefault();
+                if(!isMobile()) return;
+                showUnzipMenu('mobile');
+            });
+            document.getElementById('unzip-menu-bee-mobile').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('mobile');
+                goToBeeGame();
+            };
+            document.getElementById('unzip-menu-shuzhi-mobile').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('mobile');
+                goToShuzhiGame();
+            };
+            document.getElementById('unzip-menu-100-mobile').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('mobile');
+                goTo100Game();
+            };
+            document.getElementById('unzip-menu-fangkuai-mobile').onclick = function(e){
+                e.preventDefault();
+                hideUnzipMenu('mobile');
+                goTofangkuaiGame();
+            };
+            document.addEventListener('mousedown', function(e){
+                if(isMobile() && mobileMenu.classList.contains('show')) {
+                    if(!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+                        hideUnzipMenu('mobile');
+                    }
+                }
+            });
+            document.addEventListener('keydown',function(e){
+                if(e.key === 'Escape' && mobileMenu.classList.contains('show')) {
+                    hideUnzipMenu('mobile');
+                    mobileBtn.blur();
+                }
+            });
+            mobileMenu.addEventListener('blur',function(){
+                setTimeout(()=>{hideUnzipMenu('mobile');},100);
+            });
+        }
+        // fix: 刷新或切换端时菜单强制关闭
+        window.addEventListener('resize', function(){
+            hideUnzipMenu('pc');
+            hideUnzipMenu('mobile');
+        });
+
+    });
+    </script>
+
+
+
+    <!-- 直接插入菜单HTML，复制到每个页面！ -->
+    <div class="floating-nav">
+        <ul class="nav-list">
+            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
+            <li class="main-menu">
+                <i class="fas fa-gamepad"></i>
+                <span>解压游戏</span>
+            </li>
+            <li><i class="fas fa-bug"></i><a href="mifeng.html">蜜蜂大冒险</a></li>
+            <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
+            <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
+            <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
+        </ul>
+    </div>
+
+
+
+</body>
+</html>
