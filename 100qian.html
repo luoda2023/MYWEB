@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>AI算命游戏</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+
+
+        /* 菜单CSS */
+        .floating-nav {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #1E3A5F;
+            border-radius: 8px 0 0 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: width 0.3s;
+            width: 50px;
+            z-index: 9999;
+        }
+        .floating-nav:hover { width:250px; }
+        .nav-list {list-style: none; margin:0; padding:0;}
+        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
+        .nav-list li:hover {background:#5E8BFF;}
+        .nav-list li i {font-size:18px; color:#4ECDC4;}
+        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
+        .floating-nav:hover .nav-list li a, 
+        .floating-nav:hover .nav-list li span {opacity:1;}
+        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
+        @media (max-width:768px){.floating-nav{display:none;}}
+        /* 下面放你的其他body样式... */
+
+
+
+
+:root {
+  --color-sign-up: #fc4254;
+  --color-sign-mid: #e0b000;
+  --color-sign-down: #439efa;
+}
+html,body {
+  margin:0;padding:0; /* 保证无滚动条 */
+  font-family:'Helvetica Neue','PingFang SC','Microsoft YaHei',Arial,sans-serif;
+  background:#fff;color:#222;
+}
+body{min-height:100vh;overflow-x:hidden;}
+#bg-canvas, #bg-clouds {
+  position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:0;pointer-events:none;
+}
+#bg-canvas {
+  opacity:0.07;
+}
+#bg-clouds {
+  opacity:0.35;
+}
+.main-logo,
+.card-ctrlwrap,
+.ai-sum-blk,
+.signs-desc-row,
+.signs-grid-wrap,
+.ai-sum-text {
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 70vw;
+}
+.main-logo{margin:32px auto 18px auto;text-align:center;}
+.main-logo img{width:76px;height:76px;opacity:0.32;}
+.card-ctrlwrap{
+  background:#f7f8fa; border-radius:18px; box-shadow:0 2px 8px #e4e8f02c;
+  border:1px solid #ececec; margin:30px auto 0 auto;
+  padding:18px 26px; display:flex; align-items:center; gap:13px; flex-wrap:wrap; min-height:60px; position:relative; z-index:2;
+  justify-content: flex-start;
+}
+.dropdown-label{ margin-right:10px;font-size:16px;white-space:nowrap;color:#484350;font-weight:500; }
+.dropdown-wrap { flex:1; min-width:130px;}
+.dropdown {
+  font-size:1em; border: 1.2px solid #b0b0b0; border-radius: 7px; padding: 10px 13px;
+  min-width: 100px; color: #222; background: #fff;
+  appearance: none; cursor:pointer;outline:none;
+}
+.stat-inline {
+  display: flex; align-items: center; gap:7px;margin-left:12px;margin-right:0;font-size:15px;
+}
+.stat-inline .statlabel {font-size:15px;color:#bd9a9a;margin:0;}
+.stat-inline .statnum   {font-weight:bold;font-size:19px;margin:0 3px;}
+.statnum.up   { color: var(--color-sign-up);}
+.statnum.mid  { color: var(--color-sign-mid);}
+.statnum.down { color: var(--color-sign-down);}
+
+/* =====按钮优化开始======= */
+.btn-group {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+}
+.card-btn {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 18px;
+  border: 1.7px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 21px;
+  background: #ffffff;
+  color: #222;
+  font-weight: 550;
+  cursor: pointer;
+  transition: .17s;
+  letter-spacing: 1.1px;
+  box-shadow: 0 1.8px 8px #e5e5e7;
+  min-width: 0;
+  white-space: nowrap;
+}
+.card-btn.selected,.card-btn:hover{background:#38363a;color:#fff;border-color:#8b779f;}
+.card-btn svg{
+  display: inline-block;
+  vertical-align: middle;
+  width: 22px;
+  height: 22px;
+  margin-right: 0;
+  flex-shrink: 0;
+}
+/* =====按钮优化结束======= */
+
+.ai-sum-blk{margin:32px auto 0 auto;}
+.ai-sum-title{font-size:21px;color:#151616;font-weight:600;margin-bottom:14px;}
+.ai-sum-text{
+  font-size:20px !important; 
+  font-weight:bold !important;
+  line-height:2;
+  color:#2f2830;
+  min-height:20px; margin-bottom:4px;
+  background:transparent; border:none; box-shadow:none; padding:0 1px;
+  width:100%; box-sizing:border-box;
+  transition: color .2s;
+}
+.ai-sum-text.up{color:var(--color-sign-up);}
+.ai-sum-text.mid{color:var(--color-sign-mid);}
+.ai-sum-text.down{color:var(--color-sign-down);}
+.signs-desc-row {
+  font-size:11px; color:#888;
+  background:none; border:none; box-shadow:none; padding:0 2px;
+  text-align:left; margin:18px auto 10px auto;
+  width:100%; box-sizing:border-box;
+}
+.signs-grid-wrap{
+  margin:0 auto 70px auto;
+  width:100%; box-sizing:border-box;
+}
+.signs-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(214px,1fr));
+  gap:18px;align-items:stretch; width:100%;
+}
+.signcell{
+  background:#f8fafc; border-radius:15px; border:1.13px solid #c9d0d7;
+  box-shadow:0 1.2px 8px #e4e8f010; padding:15px 16px 13px 16px;font-size:16px;color:#232328;
+  cursor:pointer;transition:.13s;display:flex;flex-direction:column;justify-content:space-between;position:relative;min-width:0; box-sizing:border-box;
+}
+.signcell:hover, .signcell.focused {border-color:#be9ace;box-shadow:0 2px 14px #ae70e944;}
+.sign-title{font-weight:600;color:#2a1a47;font-size:17px;line-height:1.25;}
+.sign-short{color:#7a8ea0;margin:7px 0 0 0;font-size:15px;}
+.sign-level{
+  position:absolute;right:13px;top:10px;
+  color:#fff;border-radius:9px;
+  font-size:11px; 
+  padding:2px 7px 2px 7px; font-weight:600; letter-spacing:1.1px;display:inline-flex;align-items:center;gap:3px;}
+.sign-level.up{background:var(--color-sign-up);}
+.sign-level.mid{background:var(--color-sign-mid);}
+.sign-level.down{background:var(--color-sign-down);}
+.sign-level-num{
+  margin-left:2px;font-weight:400;font-size:1.19em; color:#fff; opacity:0.76; letter-spacing:1px;}
+.sign-modal-mask{
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(120,120,130,0.18);
+  z-index:333;display:flex;align-items:center;justify-content:center;
+  box-sizing:border-box;
+  padding:0;
+}
+.sign-modal{
+  max-width:600px; min-width:320px; width:94vw;
+  background:#fff; border-radius:20px; box-shadow:0 10px 70px #7082c980;
+  padding:38px 34px 28px 34px;
+  color:#361066; position:relative;font-size:19px;line-height:1.72;
+  animation:popin .22s cubic-bezier(0.8,1,0.7,1.3);overflow-y:auto;max-height:95vh;
+  box-sizing: border-box;
+}
+@keyframes popin{0%{transform:scale(0.4); opacity:0;} 100%{transform:scale(1);opacity:1;}}
+.sign-modal .title{font-size:23px;font-weight:700;margin-bottom:11px;}
+.sign-modal .level{
+  font-size:18px;margin-right:10px;color:#fff;padding:3.5px 19px 3.5px 15px;border-radius:11px;display:inline-flex;align-items:center;gap:7px;}
+.sign-modal .level .sign-level-num{margin-left:5px;font-size:1em;color:#fff;opacity:0.72;font-weight:400;}
+.sign-modal .level.up{background:var(--color-sign-up);}
+.sign-modal .level.mid{background:var(--color-sign-mid);}
+.sign-modal .level.down{background:var(--color-sign-down);}
+.sign-modal .poem{color:#111;border-left:3px solid #acadef;padding-left:15px;line-height:1.8;margin:22px 0 19px 0;font-size:18px;}
+.sign-modal .meaning{color:#0a9957;font-weight:600;margin-top:15px;font-size:18px;}
+.sign-modal .plain{color:#b94963;margin-top:11px;font-size:17px;}
+.sign-modal .story{color:#337ca5;margin-top:11px;font-size:16px;}
+.sign-modal .hint{margin:14px 0 0 0;font-size:15px;color:#a185e0;}
+.sign-modal .close-btn{
+  position:absolute;right:18px;top:17px;
+  color:#aaa;font-size:35px;font-weight:700;
+  cursor:pointer;transition:.13s;border:none;background:none;}
+.sign-modal .close-btn:hover{color:#bb3434;}
+.countdown-bottom{
+  width:100vw;
+  text-align:center;
+  margin:36px 0 11px 0;
+  color:#454545;
+  font-size:16.2px;
+  opacity:0.93;
+  font-weight:600;
+  letter-spacing:1.2px;
+  position:fixed;
+  bottom:0; left:0; z-index:4; background:rgba(250,250,250,0.91);
+  padding:8px 0 6px 0;
+  border-top:1px solid #e0e0ef;
+  box-sizing: border-box;
+}
+@media screen and (max-width:830px){
+  .main-logo, .card-ctrlwrap, .ai-sum-blk, .signs-desc-row, .signs-grid-wrap, .ai-sum-text {
+    max-width:99vw;
+  }
+  .sign-modal {max-width:99vw;}
+}
+@media screen and (max-width:540px){
+  .main-logo img{width:54px;height:54px;}
+  .card-ctrlwrap{padding:20px 3.5vw;}
+  .signcell{font-size:14.5px;}
+  .sign-modal{padding:20px 3.5vw 13px 3.5vw;min-width:0;}
+  .ai-sum-title{font-size:17px;}
+  .signs-desc-row{padding:0;}
+  .main-logo,.card-ctrlwrap,.ai-sum-blk,.signs-desc-row,.signs-grid-wrap,.ai-sum-text{ 
+      max-width:95%;
+      padding-left:2.5vw;
+      padding-right:2.5vw;
+  }
+  .btn-group {
+    flex: 1 1 auto;
+    gap: 5px;
+    justify-content: center;
+  }
+  .card-btn {
+    font-size: 15px;
+    padding: 11px 2vw;
+    min-width: 0;
+    flex: 1 1 0;
+    white-space: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .card-btn svg {
+    width: 18px;
+    height: 18px;
+    margin-right: 0;
+  }
+  .countdown-bottom{font-size:13.3px;padding:7px 0 5px 0;}
+}
+/* ====== 兼容修正 START ====== */
+/* 去除全局 body 的 padding-bottom，避免PC端滚动条 */
+body { padding-bottom: 0 !important; }
+/* 移动端适配底部空间，防止签文被倒计时遮挡 */
+@media (max-width:600px){
+  body { padding-bottom: 62px !important; }
+  .signs-grid-wrap { padding-bottom: 46px; }
+}
+/* ====== 兼容修正 END ====== */
+@media (max-width:600px){
+  .sign-modal-mask {
+    padding-left:30px;
+    padding-right:30px;
+    box-sizing:border-box;
+  }
+  .sign-modal{
+    padding-left:30px !important;
+    padding-right:30px !important;
+    min-width:0;
+    width:100vw;
+    max-width:600px;
+    box-sizing: border-box;
+  }
+}
+  </style>
+</head>
+<body>
+<div id="bg-clouds">
+  <svg width="100vw" height="100vh" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100vw;height:100vh">
+    <g>
+      <path id="cloud1" d="M210 150 Q255 130 310 150 Q320 127 350 150 Q375 166 390 150 Q415 120 470 150" stroke="#e1ded9" stroke-width="5" fill="none" opacity="0.28"/>
+      <path id="cloud2" d="M680 110 Q710 90 760 110 Q780 94 820 109 Q850 122 865 101" stroke="#f1eadc" stroke-width="4" fill="none" opacity="0.18"/>
+      <path id="cloud3" d="M990 200 Q1020 190 1050 210 Q1070 195 1120 230 Q1150 245 1170 220" stroke="#e0d9bd" stroke-width="6" fill="none" opacity="0.22"/>
+    </g>
+  </svg>
+</div>
+<canvas id="bg-canvas"></canvas>
+<div class="main-logo">
+  <a href="index.html">
+    <img src="logo2.png" alt="logo">
+  </a>
+</div>
+<div class="card-ctrlwrap">
+  <span class="dropdown-label">选择你的抽签咨询方向：</span>
+  <div class="dropdown-wrap">
+    <select id="topic" class="dropdown">
+      <option value="事业">事业</option>
+      <option value="情感">情感</option>
+      <option value="学业">学业</option>
+      <option value="健康">健康</option>
+      <option value="财运">财运</option>
+      <option value="其他">其他</option>
+    </select>
+  </div>
+  <div id="statInline" class="stat-inline" style="display:none;">
+    <span class="statlabel">上签</span><span id="statUp" class="statnum up">0</span>
+    <span class="statlabel">中签</span><span id="statMid" class="statnum mid">0</span>
+    <span class="statlabel">下签</span><span id="statDown" class="statnum down">0</span>
+  </div>
+  <div class="btn-group">
+    <button class="card-btn selected" id="btn1">
+      <svg viewBox="0 0 44 44" fill="none">
+        <rect x="16" y="17" width="12" height="14" rx="4" stroke="#ac7b27" stroke-width="2" fill="#f8e6b1"/>
+        <rect x="18.6" y="4" width="6.8" height="18" rx="2" stroke="#926d2c" stroke-width="1.5" fill="#ede4cd"/>
+        <rect x="22" y="11" width="2" height="16" rx="1" fill="#ebe9d7"/>
+      </svg>
+      仅抽1签
+    </button>
+    <button class="card-btn" id="btn5">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#bbb" stroke-width="2"/><path d="M23 10l-8 10h7l-2 10l8-12h-7z" fill="#6d67a9"/></svg>
+      连抽5签
+    </button>
+    <button class="card-btn" id="btn10">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#bbb" stroke-width="2"/><path d="M15 14l-3 12h3l2-5h3l2 5h3l-3-12z M27 15h5l-2.5 8z" fill="#e7b422"/></svg>
+      连抽10签
+    </button>
+  </div>
+</div>
+<div id="tipDailyPopup" style="display:none;position:fixed;z-index:1999;left:0;top:0;width:100vw;height:100vh;pointer-events:none;">
+  <div id="tipDailyInner"
+    style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+        background:#fff;padding:30px 22px 22px 22px;border-radius:13px;box-shadow:0 5px 38px #cabcebcc;
+        font-size:16.8px;color:#b30b2f;font-weight:600;max-width:85vw;text-align:center;pointer-events:auto;">
+    每天仅能算一卦哦，明天0点可重新抽签<br>
+    <button style="margin-top:16px;padding:6px 33px;font-size:17px;background:#eee;border:none;border-radius:7px;cursor:pointer;" onclick="hideDailyTipPopup()">我知道了</button>
+  </div>
+</div>
+<div id="aiSumBlk" class="ai-sum-blk" style="display:none;">
+  <div class="ai-sum-text" id="jieguoRes"></div>
+</div>
+<div id="signsDescRow" class="signs-desc-row" style="display:none;">
+  点击以下签文简文，弹出详细签文。
+</div>
+<div id="signsWrap" class="signs-grid-wrap" style="display:none;">
+  <div class="signs-grid" id="signList"></div>
+</div>
+<div style="display:none" id="modalMask" class="sign-modal-mask">
+  <div class="sign-modal" id="modalSign">
+    <button class="close-btn" onclick="hideSignDetail()">&times;</button>
+  </div>
+</div>
+<div class="countdown-bottom" id="countdownTip"></div>
+<script src="100qian.js"></script>
+<script src="zhongje.js100qian.js"></script>
+<script src="jieguo.js"></script>
+<script>
+// ================ 以下 JS 保持原有核心逻辑 ================
+const STORAGE_KEY = "dailyqian_result";
+const TEST_MODE = false;
+function getTodayStr() {
+  var d = new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+function saveDailyResult(signIndexes, topic) {
+    const obj = {
+        date: getTodayStr(),
+        picks: signIndexes,
+        topic: topic,
+        mode: MODE
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+function loadDailyResult() {
+    try{
+        const s = localStorage.getItem(STORAGE_KEY);
+        if(!s) return null;
+        return JSON.parse(s);
+    }catch(e){return null;}
+}
+function clearDailyResult() {
+    localStorage.removeItem(STORAGE_KEY);
+}
+let MODE = 1, pickedIndexes = [], topicVal = "事业", drawed = false;
+let lockedTopic = false;
+let LAST_PICK_BTN = 1;
+function showDailyTipPopup(){
+  document.getElementById("tipDailyPopup").style.display = "block";
+}
+function hideDailyTipPopup(){
+  document.getElementById("tipDailyPopup").style.display = "none";
+}
+function tryChooseBtn(v){
+  const info = loadDailyResult();
+  if (!TEST_MODE && info && info.date === getTodayStr()) {
+    showDailyTipPopup();
+    return;
+  }
+  chooseBtn(v);
+}
+document.getElementById("btn1").onclick = ()=>tryChooseBtn(1);
+document.getElementById("btn5").onclick = ()=>tryChooseBtn(5);
+document.getElementById("btn10").onclick = ()=>tryChooseBtn(10);
+function setBtnGroupActive(v) {
+  document.getElementById("btn1").classList.toggle("selected", v == 1);
+  document.getElementById("btn5").classList.toggle("selected", v == 5);
+  document.getElementById("btn10").classList.toggle("selected", v == 10);
+  LAST_PICK_BTN = v;
+}
+function chooseBtn(v){
+  if(document.getElementById("btn1").disabled) return;
+  MODE = v;
+  setBtnGroupActive(v);
+  drawSigns(true);
+}
+document.getElementById("topic").onchange = function(){
+  if(lockedTopic) return;
+  topicVal = this.value;
+  if(drawed) drawSigns(false,true);
+};
+function getMainLevel(signs){
+  let stat = {up:0,mid:0,down:0};
+  signs.forEach(s=>{
+    if(s.level==="上签")stat.up++;
+    else if(s.level==="下签")stat.down++;
+    else stat.mid++;
+  });
+  if(stat.up >= stat.mid && stat.up >= stat.down) return 'up';
+  if(stat.down >= stat.mid && stat.down > stat.up) return 'down';
+  return 'mid';
+}
+function lvcls(lv){return lv==="上签"?"up":lv==="下签"?"down":"mid";}
+function lockTopicOnce() {
+  lockedTopic = true;
+  let sel = document.getElementById("topic");
+  sel.disabled = true;
+  sel.style.background = "#f3f3f3";
+  sel.style.color = "#bbb";
+}
+function unlockTopicOnce() {
+  lockedTopic = false;
+  let sel = document.getElementById("topic");
+  sel.disabled = false;
+  sel.style.background = "";
+  sel.style.color = "";
+}
+function restoreLast() {
+    const info = loadDailyResult();
+    if(info && info.date === getTodayStr()) {
+        pickedIndexes = info.picks;
+        topicVal = info.topic;
+        MODE = info.mode || 1;
+        drawed = true;
+        document.getElementById("topic").value = topicVal;
+        showPicked();
+        document.getElementById("btn1").disabled = true;
+        document.getElementById("btn5").disabled = true;
+        document.getElementById("btn10").disabled = true;
+        document.getElementById("btn1").style.opacity = 0.6;
+        document.getElementById("btn5").style.opacity = 0.6;
+        document.getElementById("btn10").style.opacity = 0.6;
+        setBtnGroupActive(MODE);
+        lockTopicOnce();
+        return true;
+    } else {
+        document.getElementById("btn1").disabled = false;
+        document.getElementById("btn5").disabled = false;
+        document.getElementById("btn10").disabled = false;
+        document.getElementById("btn1").style.opacity = 1;
+        document.getElementById("btn5").style.opacity = 1;
+        document.getElementById("btn10").style.opacity = 1;
+        setBtnGroupActive(1);
+        unlockTopicOnce();
+        return false;
+    }
+}
+function showPicked() {
+    let signs = pickedIndexes.map(i=>window.SIGNS[i]);
+    let stat={up:0,mid:0,down:0};
+    signs.forEach(s=>{
+      if(s.level==="上签")stat.up++;
+      else if(s.level==="下签")stat.down++;
+      else stat.mid++;
+    });
+    document.getElementById("statInline").style.display="flex";
+    document.getElementById("aiSumBlk").style.display="block";
+    document.getElementById("signsWrap").style.display="block";
+    document.getElementById("signsDescRow").style.display="block";
+    document.getElementById("statUp").textContent=stat.up;
+    document.getElementById("statMid").textContent=stat.mid;
+    document.getElementById("statDown").textContent=stat.down;
+    let mainLv = getMainLevel(signs);
+    let jieguo = window.getTopicResult?window.getTopicResult(signs.map(s=>s.id), topicVal):"";
+    let jieguoRes = document.getElementById("jieguoRes");
+    jieguoRes.textContent = jieguo || "请结合签文体会吉凶与启示。";
+    jieguoRes.className = "ai-sum-text "+mainLv;
+    let html="";
+    signs.forEach((s,idx)=>{
+      html += `<div class="signcell" tabindex="0" onclick="showSignDetail(${idx})">
+        <span class="sign-title">${s.name}</span>
+        <span class="sign-short">${s.meaning.replace(/。.*?$/, "。")}</span>
+        <span class="sign-level ${lvcls(s.level)}">${s.level}<span class="sign-level-num">${s.id}</span></span>
+      </div>`;
+    });
+    document.getElementById("signList").innerHTML = html;
+    document.getElementById("btn1").disabled = true;
+    document.getElementById("btn5").disabled = true;
+    document.getElementById("btn10").disabled = true;
+    document.getElementById("btn1").style.opacity = 0.6;
+    document.getElementById("btn5").style.opacity = 0.6;
+    document.getElementById("btn10").style.opacity = 0.6;
+    setBtnGroupActive(MODE);
+    lockTopicOnce();
+}
+function drawSigns(forceShow, onlySum){
+  const info = loadDailyResult();
+  if(info && info.date === getTodayStr() && !onlySum){
+      pickedIndexes = info.picks;
+      topicVal = info.topic;
+      MODE = info.mode || 1;
+      showPicked();
+      setBtnGroupActive(MODE);
+      lockTopicOnce();
+      return;
+  }
+  drawed = forceShow===true || onlySum===true;
+  let idxArr = Array.from(window.SIGNS,(_,i)=>i);
+  pickedIndexes = shuffle(idxArr).slice(0,MODE);
+  let signs = pickedIndexes.map(i=>window.SIGNS[i]);
+  let stat={up:0,mid:0,down:0};
+  signs.forEach(s=>{
+    if(s.level==="上签")stat.up++;
+    else if(s.level==="下签")stat.down++;
+    else stat.mid++;
+  });
+  document.getElementById("statInline").style.display=drawed?"flex":"none";
+  document.getElementById("aiSumBlk").style.display=drawed?"block":"none";
+  document.getElementById("signsWrap").style.display=drawed?"block":"none";
+  document.getElementById("signsDescRow").style.display=drawed?"block":"none";
+  document.getElementById("statUp").textContent=stat.up;
+  document.getElementById("statMid").textContent=stat.mid;
+  document.getElementById("statDown").textContent=stat.down;
+  if(drawed){
+    let mainLv = getMainLevel(signs);
+    let jieguo = window.getTopicResult?window.getTopicResult(signs.map(s=>s.id), topicVal):"";
+    let jieguoRes = document.getElementById("jieguoRes");
+    jieguoRes.textContent = jieguo || "请结合签文体会吉凶与启示。";
+    jieguoRes.className = "ai-sum-text "+mainLv;
+    if(!onlySum){
+      let html="";
+      signs.forEach((s,idx)=>{
+        html += `<div class="signcell" tabindex="0" onclick="showSignDetail(${idx})">
+          <span class="sign-title">${s.name}</span>
+          <span class="sign-short">${s.meaning.replace(/。.*?$/, "。")}</span>
+          <span class="sign-level ${lvcls(s.level)}">${s.level}<span class="sign-level-num">${s.id}</span></span>
+        </div>`;
+      });
+      document.getElementById("signList").innerHTML = html;
+    }
+    if(forceShow && !onlySum) saveDailyResult(pickedIndexes, topicVal);
+    document.getElementById("btn1").disabled = true;
+    document.getElementById("btn5").disabled = true;
+    document.getElementById("btn10").disabled = true;
+    document.getElementById("btn1").style.opacity = 0.6;
+    document.getElementById("btn5").style.opacity = 0.6;
+    document.getElementById("btn10").style.opacity = 0.6;
+    setBtnGroupActive(MODE);
+    lockTopicOnce();
+  } else {
+    document.getElementById("signList").innerHTML = "";
+    document.getElementById("jieguoRes").textContent = "";
+    document.getElementById("jieguoRes").className = "ai-sum-text";
+    document.getElementById("btn1").disabled = false;
+    document.getElementById("btn5").disabled = false;
+    document.getElementById("btn10").disabled = false;
+    document.getElementById("btn1").style.opacity = 1;
+    document.getElementById("btn5").style.opacity = 1;
+    document.getElementById("btn10").style.opacity = 1;
+    setBtnGroupActive(1);
+    unlockTopicOnce();
+  }
+}
+function shuffle(arr){
+  let a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+window.showSignDetail=function(idx){
+  let sign = window.SIGNS[pickedIndexes[idx]];
+  let html = `<div class="title">${sign.name}</div>
+              <span class="level ${lvcls(sign.level)}">${sign.level}<span class="sign-level-num">${sign.id}</span></span>
+              <div class="poem">${sign.poem.replace(/\n/g,'<br>')}</div>
+              <div class="meaning">[签意] ${sign.meaning||''}</div>
+              <div class="plain">[白话] ${sign.plain||''}</div>
+              <div class="story">[典故] ${sign.story||''}</div>
+              <div class="hint">${sign.hint?Object.entries(sign.hint).map(([k,v])=>`${k}:${v}`).join("&emsp;"):""}</div>`;
+  document.getElementById("modalSign").innerHTML='<button class="close-btn" onclick="hideSignDetail()">&times;</button>' + html;
+  document.getElementById("modalMask").style.display="flex";
+};
+window.hideSignDetail=function(){document.getElementById("modalMask").style.display="none";};
+window.addEventListener("keydown",function(e){
+  if(e.key==="Escape")hideSignDetail();
+});
+if(TEST_MODE) clearDailyResult();
+if(!restoreLast()) drawSigns(false);
+function updateCountdown(){
+  let now = new Date();
+  let tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 0, 0);
+  let ms = tomorrow - now;
+  if(ms<0) ms=0;
+  let h = Math.floor(ms/3600000);
+  let m = Math.floor((ms%3600000)/60000);
+  let s = Math.floor((ms%60000)/1000);
+  let str = `距离明天0点可再次抽签： <span style="color:#000000">${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}</span>`;
+  document.getElementById("countdownTip").innerHTML = str;
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+// ========== 背景动画部分，加入中国吉祥物，canvas整体88% ===========
+(()=>{
+  const canvas=document.getElementById('bg-canvas');const ctx=canvas.getContext('2d');
+  let dpr=window.devicePixelRatio||1,W=window.innerWidth,H=window.innerHeight,particles=[];
+  // 吉祥物定义
+  const auspiciousTypes = [
+    {name:"元宝",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/50,h/30);ctx.beginPath();ctx.moveTo(5,20);ctx.arcTo(25,40,45,20,23);ctx.arcTo(25,0,5,20,23);ctx.closePath();ctx.fillStyle="#ffe448";ctx.fill();ctx.beginPath();ctx.ellipse(25,12,20,10,0,0,Math.PI*2);ctx.fillStyle="#fff78a";ctx.globalAlpha=0.95;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(25,12,6,0,Math.PI*2);ctx.fillStyle="#ffd000";ctx.fill();ctx.restore();}},
+    {name:"福",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/8);ctx.beginPath();ctx.rect(-w/2,-h/2,w,h);ctx.fillStyle="#ff5959";ctx.fill();ctx.font=`bold ${Math.round(h*0.7)}px serif`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fffde6";ctx.fillText("福",0,3);ctx.restore();}},
+    {name:"鱼",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/50,h/18);ctx.beginPath();ctx.moveTo(7,9);ctx.quadraticCurveTo(29,-2,43,9);ctx.quadraticCurveTo(38,16,32,9);ctx.quadraticCurveTo(25,21,7,9);ctx.closePath();ctx.fillStyle="#ef5246";ctx.globalAlpha=0.94;ctx.fill();ctx.beginPath();ctx.arc(35,9,2,0,2*Math.PI);ctx.fillStyle="#fff";ctx.fill();ctx.beginPath();ctx.arc(36,9,1,0,2*Math.PI);ctx.fillStyle="#222";ctx.fill();ctx.globalAlpha=1;ctx.restore();}},
+    {name:"灯笼",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.ellipse(0,0,w/2,h/2,0,0,2*Math.PI);ctx.fillStyle="#f18222";ctx.globalAlpha=0.9;ctx.fill();ctx.strokeStyle="#d34202";ctx.lineWidth=2;ctx.stroke();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(0,0,w*0.18,0,2*Math.PI);ctx.fillStyle="#fffaed";ctx.fill();ctx.fillStyle="#bc1818";ctx.fillRect(-w*0.1,-h/2-2,w*0.2,5);ctx.fillRect(-2,h/2-2,4,9);ctx.restore();}},
+    {name:"祥云",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/35,h/22);ctx.beginPath();ctx.arc(15,12,8,Math.PI/2,Math.PI*3/2);ctx.arc(25,10,7,Math.PI*1.165,Math.PI*1.835,true);ctx.arc(36,15,6,Math.PI*1.12,Math.PI*1.77);ctx.strokeStyle="#eca92a";ctx.lineWidth=3;ctx.globalAlpha=0.65;ctx.stroke();ctx.restore();}},
+    {name:"铜钱",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,w/2,0,2*Math.PI);ctx.fillStyle="#efd151";ctx.globalAlpha=0.94;ctx.fill();ctx.beginPath();ctx.arc(0,0,w/4,0,2*Math.PI);ctx.globalAlpha=1;ctx.fillStyle="#fffbd3";ctx.fill();ctx.beginPath();ctx.rect(-w/9,-w/9,w/4.5,w/4.5);ctx.fillStyle="#eab300";ctx.fill();ctx.restore();}},
+    {name:"鞭炮",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.rotate(-Math.PI/10);ctx.beginPath();ctx.rect(-w/5,-h/2,w*0.6,h);ctx.fillStyle="#d72b17";ctx.globalAlpha=0.9;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(w*0.2,0,w*0.20,0,2*Math.PI);ctx.fillStyle="#ffe274";ctx.fill();ctx.restore();}},
+    {name:"葫芦",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/25,h/36);ctx.beginPath();ctx.arc(12.5,10,9,0,Math.PI*2);ctx.arc(12.5,28,13,Math.PI*2,0,true);ctx.fillStyle="#ffbb48";ctx.globalAlpha=0.94;ctx.fill();ctx.beginPath();ctx.arc(12.5,7.5,4,0,2*Math.PI);ctx.fillStyle="#ec962c";ctx.fill();ctx.restore();}}
+  ];
+  let ausList = [];
+  function genAuspicious(total=42){
+    ausList=[];
+    for(let i=0;i<total;i++){
+      let t = auspiciousTypes[Math.floor(Math.random()*auspiciousTypes.length)];
+      let w = Math.random()*32+32;
+      let h = w * (Math.random()*0.4+0.8);
+      let speed = Math.random()*0.22+0.045;
+      let dx = (Math.random()-0.5)*.08;
+      let opa = Math.random()*0.32+0.58;
+      ausList.push({
+        ...t, w, h,
+        x:Math.random()*W, y:Math.random()*H,
+        dx,speed,opa,
+        driftSeed:Math.random()*10,i
+      });
+    }
+  }
+  function resize(){
+    W=window.innerWidth;H=window.innerHeight;
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.style.width=W+"px";canvas.style.height=H+"px";
+    ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr);
+  }
+  function genParticles(num=120){
+    particles=[];
+    for(let i=0;i<num;i++){
+      let size=Math.random()*3+1.2;
+      let opacity=Math.random()*0.35+0.34;
+      let color=Math.random()>0.7?'#eed8d2':(Math.random()>0.35?'#becee8':'#c8b3ea');
+      particles.push({x:Math.random()*W,y:Math.random()*H,dx:(Math.random()-0.5)*0.2,dy:Math.random()*0.16+0.06,r:size,opa:opacity,color});
+    }
+  }
+  function update(){
+    ctx.clearRect(0,0,W,H);
+    // 底层云粒子
+    for(let p of particles){
+      ctx.globalAlpha=p.opa;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
+      ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=10+10*p.r;
+      ctx.fill();
+      p.x+=p.dx;p.y+=p.dy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y>H)p.y=0;
+    }
+    ctx.globalAlpha=1.0;
+    // 吉祥物
+    for(let obj of ausList){
+      ctx.save();
+      ctx.globalAlpha = obj.opa;
+      let dy = Math.sin((Date.now()/4000)+obj.driftSeed)*0.35*obj.h;
+      obj.svg(ctx,obj.x, obj.y+dy, obj.w, obj.h);
+      ctx.restore();
+      obj.x += obj.dx;
+      obj.y -= obj.speed;
+      if(obj.x<-60) obj.x=W+Math.random()*30;
+      if(obj.x>W+60) obj.x=-Math.random()*40;
+      if(obj.y<-50) obj.y=H+obj.h+Math.random()*20;
+    }
+    ctx.globalAlpha=1;
+  }
+  function animate(){update();requestAnimationFrame(animate);}
+  window.addEventListener("resize",()=>{resize();genParticles();genAuspicious();});
+  resize();genParticles();genAuspicious();animate();
+})();
+// 云朵动画不变
+(()=>{
+  let c1=document.querySelector('#cloud1'),c2=document.querySelector('#cloud2'),c3=document.querySelector('#cloud3');
+  function floatPath(elem,baseD,timeSeed,amp,speed){
+    let t=(performance.now()/1000)*speed+timeSeed;
+    let d=baseD.replace(/Q([\d ]+),([\d ]+) ([\d ]+),([\d ]+) Q([\d ]+),([\d ]+) ([\d ]+),([\d ]+)/,(m,x1,y1,x2,y2,q1y1,q1y2,q2y1,q2y2)=>{
+      let fy1=(+y1)+Math.sin(t+1)*amp,fy2=(+y2)+Math.cos(t+2)*amp;
+      let fq1=(+q1y2)+Math.sin(t+0.6)*amp*0.7,fq2=(+q2y2)+Math.cos(t+1.2)*amp*0.6;
+      return `Q${x1},${fy1.toFixed(1)} ${x2},${fy2.toFixed(1)} Q${q1y1},${fq1.toFixed(1)} ${q2y1},${fq2.toFixed(1)}`;
+    });
+    elem&&(elem.setAttribute("d",d));
+  }
+  let d1="M210 150 Q255 130 310 150 Q320 127 350 150 Q375 166 390 150 Q415 120 470 150";
+  let d2="M680 110 Q710 90 760 110 Q780 94 820 109 Q850 122 865 101";
+  let d3="M990 200 Q1020 190 1050 210 Q1070 195 1120 230 Q1150 245 1170 220";
+  function step(){
+    floatPath(c1,d1,0,7,0.16);
+    floatPath(c2,d2,1.7,4,0.11);
+    floatPath(c3,d3,3.1,8,0.105);
+    requestAnimationFrame(step);
+  }
+  step();
+})();
+</script>
+    <?php include 'menu.html'; ?>
+
+
+
+
+    <!-- 直接插入菜单HTML，复制到每个页面！ -->
+    <div class="floating-nav">
+        <ul class="nav-list">
+            <li><i class="fas fa-home"></i><a href="index.html">首页</a></li>
+            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
+            <li class="main-menu">
+                <i class="fas fa-gamepad"></i>
+                <span>解压游戏</span>
+            </li>
+            <li><i class="fas fa-bug"></i><a href="mifeng.html">蜜蜂大冒险</a></li>
+            <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
+            <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
+
+        </ul>
+    </div>
+
+
+
+
+
+</body>
+</html>

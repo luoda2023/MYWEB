@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AI成语方块消消乐</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+
+
+        /* 菜单CSS */
+        .floating-nav {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #1E3A5F;
+            border-radius: 8px 0 0 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: width 0.3s;
+            width: 50px;
+            z-index: 9999;
+        }
+        .floating-nav:hover { width:250px; }
+        .nav-list {list-style: none; margin:0; padding:0;}
+        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
+        .nav-list li:hover {background:#5E8BFF;}
+        .nav-list li i {font-size:18px; color:#4ECDC4;}
+        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
+        .floating-nav:hover .nav-list li a, 
+        .floating-nav:hover .nav-list li span {opacity:1;}
+        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
+        @media (max-width:768px){.floating-nav{display:none;}}
+        /* 下面放你的其他body样式... */
+
+
+
+
+html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:#14263d;}
+#tetris-canvas{display:block;position:fixed;left:0;top:0;z-index:1;outline:none;background:#14263d;}
+#control-panel{
+    position:fixed;top:45px;right:45px;z-index:990;display:flex;gap:19px;user-select:none;pointer-events:none;
+}
+.control-wrap{display:flex;flex-direction:column;align-items:center;pointer-events:auto;}
+.control-btn{width:54px;height:54px;display:flex;align-items:center;justify-content:center;
+border-radius:50%;background:rgba(35,60,110,0.5);border:2px solid #41f9da44;transition:.15s;outline:none;
+box-shadow:0 2px 16px #37e3bb44;cursor:pointer;pointer-events:auto;backdrop-filter:blur(2.4px);position:relative;padding:0;margin:0 auto;}
+.control-btn svg{width:45px;height:45px;display:block;margin:0 auto;}
+.control-btn:active,.control-btn.active{background:rgba(32, 230, 92,0.85);box-shadow:0 5px 23px #40ec7e88;}
+.control-btn[aria-pressed="true"] {background:rgba(38,212,92,0.83); border-color:#4ef981;}
+.control-btn.pause-btn[aria-pressed="true"] {background:rgba(230,85,85,0.63);}
+.control-label{display:block;margin:7px 0 0 0; font-size:0.97em;color:#eee;text-align:center;opacity:0.89;
+    text-shadow:0 1.5px 13px #00000022,0 2px 6px #fff9;font-weight:600;user-select:none;pointer-events:none;line-height:1.15;min-width:54px;}
+#speed-control-container{
+    position:fixed;top:50px;left:55px;z-index:100;width:auto !important; height:auto;transition:width .25s cubic-bezier(.33,1.23,.46,1);
+    pointer-events:auto;overflow:visible;
+}
+#speed-control-icon{
+    position:relative;width:38px;height:38px;background:rgba(255,255,255,0.10);border-radius:10px;box-shadow:0 2px 12px #181f2a22;
+    display:flex;align-items:center;justify-content:center;z-index:102;cursor:pointer;transition:background 0.15s;
+    border:1.2px solid #4ecdc4;
+}
+#speed-control-icon svg{width:19px;height:19px;display:block;}
+#speed-control-wrap{
+    position:absolute;left:42px;top:-18px;background:rgba(30,42,70,0.99);border-radius:17px;box-shadow:0 2px 24px #3ecff955;
+    border:1.8px solid #4ecdc4bb;display:flex;flex-direction:column;align-items:center;width:400px;height:120px;min-width:220px;
+    max-width:98vw;font-size:1.13em;padding:0;margin-left:0;visibility:hidden;opacity:0;pointer-events:none;transition:all .16s;z-index:101;
+}
+#speed-control-container.panel-open #speed-control-wrap{visibility:visible !important;opacity:1 !important;pointer-events:auto !important;}
+#speed-row{width:80%;display:flex;align-items:center;justify-content:center; flex-wrap:nowrap;overflow:hidden;font-size:1.07em;
+    font-weight:600;letter-spacing:.01em; white-space:nowrap;margin-top:17px;margin-bottom:8px;}
+#speed-label,#score-label,#level-label{color:#ffc94c;font-weight:700;margin-right:10px;margin-left:2px;letter-spacing:.01em;font-size:0.98em;}
+#score-label,#level-label{color:#7beef6;}
+#speed-mult,#score-value,#level-value{color:#fff;font-size:1.07em;font-weight:bold;margin:0 10px 0 0;letter-spacing:0.01em;}
+#speed-mult{color:#4ECDC4;}#score-value{color:#ffd048;}#level-value{color:#ffc49c;}
+#speed-range{display:block;margin:0 auto 3px auto;accent-color:#4ECDC4; height:20px;border-radius:8px;outline:none;cursor:pointer;width:92%;min-width:140px;max-width:96%;box-sizing:border-box;}
+#speed-steps{width:83%;display:flex;justify-content:space-between;margin-top:0;font-size:0.96em;color:#54f7c0;opacity:.83;pointer-events:none;padding:0 8%;}
+#speed-steps span{font-size:0.96em;}
+#speed-steps span:nth-child(3){color:#ffc43a;font-weight:700;}
+#speed-control-icon:active{background:rgba(61,248,208,0.13);}
+#speed-control-icon:focus{outline:2px solid #4ecdc4;}
+#speed-control-container.panel-open #speed-control-icon{display:none !important;}
+@media (max-width:900px), (max-device-width:900px) {
+    #control-panel{top:33px; right:5vw; gap:10px;}
+    .control-btn{width:40.5px;height:40.5px;}
+    .control-btn svg{width:24px;height:24px;}
+    .control-label{font-size:0.86em;min-width:40px;}
+    #speed-control-container{left:10px;right:1vw !important;top:33px !important;}
+    #speed-control-icon{width:31px;height:31px;}
+    #speed-control-icon svg{width:17px;height:17px;}
+    #speed-control-wrap{left:auto; right:0; top:-12px;width:97vw !important; max-width:97vw!important; min-width:200px !important;
+        font-size:1em;height:122px;max-height:147px;min-height:85px; border-radius:12px;box-sizing:border-box; padding:0;}
+    #speed-row{width:98%;font-size:1.06em;margin-top:9px;}
+    #speed-steps{width:97%;padding:0 2%;font-size:0.92em;}
+    #speed-range{width:98%;min-width:55vw;max-width:95vw;}
+    #control-panel.mobile-hide { display: none !important;}
+}
+@media (max-width:510px) {
+   .control-btn{width:45px;height:45px;}
+   .control-btn svg{width:15.2px;height:15.2px;}
+   .control-label{font-size:0.76em;min-width:32px;}
+   #speed-control-wrap{font-size:0.90em;height:99px;}
+}
+.tetris-mobiletip{display:block;position:fixed;bottom:2vw;left:0;width:100vw;text-align:center;color:#4ECDC4;font-size:1.1em;
+    letter-spacing:.045em; text-shadow:0 2px 11px #4ecdc433;z-index:13;user-select:none;pointer-events:none;opacity:0.91;transition:opacity .6s;}
+@media (max-width:700px){.tetris-mobiletip{font-size:0.87em !important;padding-left:12px !important;padding-right:12px !important;box-sizing:border-box;}}
+#game-over-modal{display:none;position:fixed;z-index:222;left:0;top:0;width:100vw;height:100vh;align-items:center;justify-content:center;text-align:center;}
+#game-over-mask{position:absolute;left:0;top:0;width:100vw;height:100vh; background:rgba(30,40,60,0.88);z-index:1;}
+#game-over-dialog{position:relative;z-index:2;margin:auto;background:rgba(41,65,110,0.98); border-radius:21px;padding:2.8em 2.8em 2.2em 2.8em;box-shadow:0 22px 60px #14263f55; min-width:220px;max-width:420px;max-height:70vh;color:#ffc94c;font-size:1.24em;font-weight:bold;letter-spacing:.02em;display:flex;flex-direction:column;align-items:center;animation:fadeInAni .6s cubic-bezier(.47,0,.11,1);}
+@media (max-width:700px){#game-over-dialog {width:calc(100vw - 40px) !important;max-width:calc(100vw - 40px) !important;padding:2.2em 0.5em 1.1em 0.5em !important;font-size:1.09em;box-sizing:border-box;}}
+@media (max-width:420px) { #game-over-dialog{width:calc(100vw - 10vw) !important;max-width:calc(100vw - 10vw) !important; padding-left:5vw; padding-right:5vw;}}
+#game-over-title{font-size:1.45em;margin-bottom:.40em;font-weight:700;letter-spacing:.13em;}
+#game-over-msg{font-size:1.14em;margin-bottom:.5em;}
+#game-over-info{font-size:.99em;font-weight:400;margin-bottom:1.2em;color:#eee;opacity:.73;}
+#restart-btn-modal{font-size:1.18em;font-weight:800; background:linear-gradient(90deg,#4ecdc4 20%,#5E8BFF 80%);color:#fff;padding:.68em 2.1em;
+    border-radius:13px;border:none;box-shadow:0 6px 18px #328bed22;cursor:pointer;transition:.16s;}
+#restart-btn-modal:hover{background:linear-gradient(90deg,#ffc33a 5%,#4ecdc4 95%);color:#325;}
+@keyframes fadeInAni{from{transform:scale(0.78) translateY(80px);opacity:0;}to{transform:none;opacity:1;}}
+</style>
+<script src="chengyu.js"></script>
+</head>
+<body>
+<div id="speed-control-container" tabindex="0">
+  <div id="speed-control-icon" title="速度/分数" tabindex="0">
+    <svg viewBox="0 0 32 32"><polyline points="9,5 23,16 9,27" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div id="speed-control-wrap" tabindex="-1">
+    <div id="speed-row">
+      <span id="speed-label">速度:</span>
+      <span id="speed-mult">1</span>
+      <span id="score-label">分数:</span>
+      <span id="score-value">0</span>
+      <span id="level-label">等级:</span>
+      <span id="level-value">1</span>
+    </div>
+    <input id="speed-range" type="range" min="0" max="4" step="1" value="2">
+    <div id="speed-steps">
+      <span>0.25</span><span>0.5</span><span>1</span><span>2</span><span>3</span>
+    </div>
+  </div>
+</div>
+<div id="control-panel">
+    <div class="control-wrap">
+        <button id="auto-btn" class="control-btn auto-btn" aria-pressed="false" tabindex="0" title="AI自动拼图">
+            <svg viewBox="0 0 36 36" id="ai-inactive"><circle cx="18" cy="18" r="15" stroke="#aaa" stroke-width="2.8" fill="none"/><rect x="21" y="6" width="6" height="8" rx="2" fill="#aaa" transform="rotate(45 24 10)"/><circle cx="12" cy="25" r="4" fill="#b0b0b0" stroke="#ededed" stroke-width="0.9"/><rect x="11" y="15" width="2.5" height="9" rx="1.17" fill="#aaa" transform="rotate(23 12.25 19.5)"/></svg>
+        </button>
+        <span class="control-label" id="auto-label">自动</span>
+    </div>
+    <div class="control-wrap">
+        <button id="pause-btn" class="control-btn pause-btn" aria-pressed="false" tabindex="0" title="暂停/继续">
+            <svg id="pause-svg" viewBox="0 0 38 38">
+                <circle cx="19" cy="19" r="15" stroke="#fff" stroke-width="3" fill="none"/>
+                <rect x="13" y="10" width="4.9" height="18" rx="1.7" fill="#fff"/>
+                <rect x="20" y="10" width="4.9" height="18" rx="1.7" fill="#fff"/>
+            </svg>
+        </button>
+        <span class="control-label" id="pause-label">暂停</span>
+    </div>
+</div>
+<canvas id="tetris-canvas" tabindex="1"></canvas>
+<div class="tetris-mobiletip" id="game-tip">
+    手机滑动定位/点击旋转；PC鼠标悬停定位/左右键旋转。每一格为物理厘米单位。
+</div>
+<div id="game-over-modal">
+  <div id="game-over-mask"></div>
+  <div id="game-over-dialog">
+    <div id="game-over-title">游戏结束</div>
+    <div id="game-over-msg">你获得了 <b id="final-score" style="color:#ffc43a;font-size:1.15em"></b> 分！<br>继续挑战巅峰吧！</div>
+    <div id="game-over-info">重新开始游戏，看看你能否突破更高分数记录～</div>
+    <button id="restart-btn-modal">再来一局</button>
+  </div>
+</div>
+<script>
+function getRandomChengyuChars() {
+    if (!window.CHENGYU || !window.CHENGYU.length) return ['无','成','语','字'];
+    let chengyu = window.CHENGYU[Math.floor(Math.random() * window.CHENGYU.length)];
+    if (chengyu.length !== 4) chengyu = (chengyu + "无无无无").slice(0,4); // 容错
+    return chengyu.split('');
+}
+function isMobile() {
+    return ((window.matchMedia && window.matchMedia("only screen and (max-width: 900px)").matches) ||
+            (navigator.maxTouchPoints>0 || "ontouchstart" in window));
+}
+const MIN_MARGIN = 5;
+let COLS=10, ROWS=20, CELL_SIZE=40, CANVAS_W=800, CANVAS_H=1000;
+let START_X=0, START_Y=0;
+function getCmInPx(){
+    let d=document.createElement('div');
+    d.style.position="absolute";d.style.left="-1000cm";d.style.top="-1000cm";
+    d.style.width="1cm";d.style.height="1cm";document.body.appendChild(d);
+    let px=d.offsetWidth;document.body.removeChild(d);
+    return px;
+}
+function recomputeGridLayout(){
+    let cmPx = getCmInPx();
+    if (isMobile()){
+        CELL_SIZE = Math.floor(1.5 * cmPx);
+        let usableW = window.innerWidth, usableH = window.innerHeight;
+        COLS = Math.floor((usableW - 2*MIN_MARGIN) / CELL_SIZE);
+        ROWS = Math.floor((usableH - 2*MIN_MARGIN) / CELL_SIZE);
+        if (COLS<4) COLS=4;
+        if (ROWS<8) ROWS=8;
+    }else{
+        CELL_SIZE = Math.floor(2.0 * cmPx);
+        let usableW = window.innerWidth, usableH = window.innerHeight;
+        COLS = Math.floor((usableW - 2*MIN_MARGIN) / CELL_SIZE);
+        ROWS = Math.floor((usableH - 2*MIN_MARGIN) / CELL_SIZE);
+        if (COLS<6) COLS=6;
+        if (ROWS<12) ROWS=12;
+    }
+    let gridW = COLS*CELL_SIZE, gridH = ROWS*CELL_SIZE;
+    START_X = Math.floor((window.innerWidth - gridW)/2);
+    START_Y = Math.floor((window.innerHeight - gridH)/2);
+    if(START_X < MIN_MARGIN) START_X = MIN_MARGIN;
+    if(START_Y < MIN_MARGIN) START_Y = MIN_MARGIN;
+    CANVAS_W = window.innerWidth; CANVAS_H = window.innerHeight;
+    let cvs=document.getElementById('tetris-canvas');
+    cvs.width = CANVAS_W; cvs.height = CANVAS_H;
+    cvs.style.width = CANVAS_W+"px"; cvs.style.height = CANVAS_H+"px";
+}
+const COLORS={I:"linear-gradient(135deg, #5E8BFF 60%, #329ad1 100%)",O:"linear-gradient(135deg, #ffd048 80%, #ffc900 100%)",T:"linear-gradient(120deg, #a189ec 41%, #5E8BFF 95%)",S:"linear-gradient(110deg, #66f199 55%, #4ECDC4 100%)",Z:"linear-gradient(110deg, #EF586D 60%, #ffc33a 95%)",L:"linear-gradient(120deg, #ffac55 60%, #ffa500 100%)",J:"linear-gradient(90deg, #328bed 60%, #4ccfff 95%)"};
+const CHAR_COLORS = {I: "rgba(26,62,155,0.72)",O: "rgba(165,120,0,0.66)",T: "rgba(90,40,175,0.66)",S: "rgba(14,103,60,0.66)",Z: "rgba(180,60,0,0.65)",L: "rgba(175,100,0,0.66)",J: "rgba(22,46,148,0.65)"};
+const SHAPES={I:[[0,1],[1,1],[2,1],[3,1]],O:[[0,0],[1,0],[0,1],[1,1]],T:[[1,0],[0,1],[1,1],[2,1]],S:[[1,0],[2,0],[0,1],[1,1]],Z:[[0,0],[1,0],[1,1],[2,1]],L:[[0,0],[0,1],[1,1],[2,1]],J:[[2,0],[0,1],[1,1],[2,1]]};
+const BLOCK_IDS=Object.keys(SHAPES);const SPEED_MULTS=[0.25,0.5,1,2,3];
+let board,cur,next,score,level,isGameOver,running=true,lastTick,requestId;
+let paused=false,autoPlaying=false;
+let autoTarget=null, autoTickTs=0;
+const cvs=document.getElementById("tetris-canvas"),ctx=cvs.getContext("2d");
+const scoreEl=document.getElementById("score-value"),levelEl=document.getElementById("level-value");
+let speedMult=1, dropSpeedRaw=480, dropSpeed=480;
+// 关键：每个block生成时，切分4字成语到4个格子
+function createBoard(){return Array.from({length:ROWS},()=>Array(COLS).fill(null));}
+function copy(p){
+    return {
+        id:p.id, rot:p.rot, x:p.x, y:p.y,
+        shape:p.shape.map(([x,y])=>[x,y]),
+        chars: p.chars ? p.chars.slice() : undefined
+    };
+}
+function randomPiece(){
+    let id=BLOCK_IDS[Math.floor(Math.random()*BLOCK_IDS.length)];
+    let shape=SHAPES[id].map(s=>[s[0],s[1]]);
+    let minDx=Math.min(...shape.map(([x,])=>x)),maxDx=Math.max(...shape.map(([x,])=>x));
+    let width=maxDx-minDx+1,x=Math.floor((COLS-width)/2)-minDx;
+    let chars = getRandomChengyuChars(); // ['不','可','思','议']
+    return {id,rot:0,x:x,y:0,shape:shape, chars:chars};
+}
+function applyRotate(shape,rot){
+    let res=shape.map(([x,y])=>[x,y]);
+    for(let i=0;i<((rot%4)+4)%4;i++) res=res.map(([xx,yy])=>[yy,-xx]);
+    return res;
+}
+function valid(piece){
+    let {shape,x,y,rot}=piece,gs=applyRotate(shape,rot||0);
+    for(let [dx,dy]of gs){
+        let nx=x+dx,ny=y+dy;
+        if(nx<0||nx>=COLS||ny<0||ny>=ROWS)return false;
+        if(ny>=0&&board[ny][nx])return false;
+    }
+    return true;
+}
+function tryMove(dx,dy,rotDelta){
+    let test=copy(cur);
+    test.x+=dx;test.y+=dy;test.rot=((test.rot||0)+(rotDelta||0)+4)%4;
+    let gs=applyRotate(test.shape,test.rot),minDx=Math.min(...gs.map(([x,])=>x)),maxDx=Math.max(...gs.map(([x,])=>x));
+    if(test.x<-minDx)test.x=-minDx;if(test.x>COLS-1-maxDx)test.x=COLS-1-maxDx;
+    if(valid(test)){cur=test;return true;}return false;
+}
+function merge(){
+    let piece=cur,gs=applyRotate(piece.shape,piece.rot||0);
+    for(let i=0;i<gs.length;i++){
+        let [dx,dy]=gs[i],x=piece.x+dx,y=piece.y+dy;
+        if(y>=0) board[y][x]={id:piece.id,char:piece.chars[i]};
+    }
+}
+function removeLines(){
+    let count=0;
+    for(let r=ROWS-1;r>=0;r--){
+        if(board[r].every(cell=>cell)){
+            board.splice(r,1);board.unshift(Array(COLS).fill(null));count++;r++;
+        }
+    }
+    if(count){
+        score+=[0,40,100,300,1200][count]*(level+1);
+        if(score>(level+1)*440){level++;recalcDropSpeed();}
+    }
+}
+function recalcDropSpeed(){dropSpeed=Math.max(30,dropSpeedRaw/speedMult-level*67);}
+function newBlock(){
+    cur=next;next=randomPiece();
+    let minDx=Math.min(...cur.shape.map(([x,])=>x)),maxDx=Math.max(...cur.shape.map(([x,])=>x)),width=maxDx-minDx+1;
+    cur.x=Math.floor((COLS-width)/2)-minDx;cur.y=0;cur.rot=0;
+    if(!valid(cur)){running=false;isGameOver=true;showGameOverModal();draw();}
+    recalcDropSpeed();
+}
+function dropDown(times=1){
+    for(let i=0;i<times;i++){
+        let moved=tryMove(0,1,0);
+        if(!moved){merge();removeLines();newBlock();break;}
+    }
+}
+function getBlockColor(type,ctx,x,y,w,h){
+    let v=COLORS[type];
+    if(v&&v.startsWith('linear-gradient')){
+        let colors=v.match(/#[A-Fa-f0-9]{6}/g);
+        if(!colors||colors.length<2)return colors?colors[0]:'#fff';
+        let grd=ctx.createLinearGradient(x,y,x+w,y+h);
+        grd.addColorStop(0,colors[0]);grd.addColorStop(1,colors[1]);
+        return grd;
+    }
+    return v||'#fff';
+}
+function draw(){
+    ctx.clearRect(0,0,CANVAS_W,CANVAS_H);
+    ctx.save();ctx.globalAlpha=0.13;ctx.strokeStyle="#33e4e9";ctx.lineWidth=2.1;ctx.beginPath();ctx.rect(START_X-2,START_Y-2,CELL_SIZE*COLS+4,CELL_SIZE*ROWS+4);ctx.stroke();
+    for(let i=0;i<=COLS;i++){let xx=START_X+i*CELL_SIZE;ctx.beginPath();ctx.moveTo(xx,START_Y);ctx.lineTo(xx,START_Y+CELL_SIZE*ROWS);ctx.stroke();}
+    for(let i=0;i<=ROWS;i++){let yy=START_Y+i*CELL_SIZE;ctx.beginPath();ctx.moveTo(START_X,yy);ctx.lineTo(START_X+CELL_SIZE*COLS,yy);ctx.stroke();}
+    ctx.restore();
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++)
+    if(board[r][c]) drawBlock(c,r,board[r][c].id,false,0.97,board[r][c].char);
+    let ghost=copy(cur);ghost.x=cur.x;ghost.y=cur.y;ghost.rot=cur.rot;
+    while(true){let t=copy(ghost);t.y++;if(valid(t))ghost.y++;else break;}
+    let gshape=applyRotate(ghost.shape,ghost.rot);
+    for(let i=0; i<gshape.length; i++){
+        let [dx,dy]=gshape[i],gx=ghost.x+dx,gy=ghost.y+dy;
+        drawBlock(gx,gy,cur.id,true,0.10,'');
+    }
+    let cshape=applyRotate(cur.shape,cur.rot);
+    for(let i=0;i<cshape.length;i++){
+        let [dx,dy]=cshape[i],px=cur.x+dx,py=cur.y+dy;
+        drawBlock(px,py,cur.id,true,1, cur.chars[i]);
+    }
+    scoreEl.textContent=score;
+    levelEl.textContent=level+1;
+}
+function drawBlock(x,y,type,active,alpha=1,char=''){
+    let sw=CELL_SIZE,sh=CELL_SIZE;
+    let px=START_X+x*sw,py=START_Y+y*sh;
+    let color=getBlockColor(type,ctx,px,py,sw,sh);
+    ctx.save();ctx.globalAlpha=alpha;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(px+1,py+1,sw-2,sh-2,sw/3.5);
+    else ctx.rect(px+1,py+1,sw-2,sh-2);
+    ctx.fillStyle=color;ctx.fill();ctx.shadowBlur=0;
+    ctx.restore();
+    // 只绘一个汉字（不是整句成语），0.65倍字体，透明度0.5
+    if(char && /[\u4e00-\u9fa5]/.test(char)){
+        let fsize = sw*0.65;
+        ctx.save();
+        ctx.globalAlpha=0.5;
+        ctx.font = `bold ${fsize}px SimHei,黑体,Arial,sans-serif`;
+        ctx.textAlign="center";ctx.textBaseline="middle";
+        ctx.fillStyle = CHAR_COLORS[type] ? CHAR_COLORS[type] : "rgba(60,60,60,.70)";
+        ctx.fillText(char,px+sw/2,py+sh/2+1);
+        ctx.restore();
+    }
+}
+// =================== 互动/AI/UI略，全部和原版一致 ==========================
+function isOpLocked(){return paused||autoPlaying||isGameOver||!running;}
+let isDragging=false,dragMoved=false; let lastTouchTime=0;
+cvs.addEventListener('mousemove',function(e){
+    if(isOpLocked()||isMobile())return;
+    const rect=cvs.getBoundingClientRect();let mousex=e.clientX-rect.left;
+    if(mousex<START_X-7||mousex>START_X+CELL_SIZE*COLS+7||!document.hasFocus())return;
+    let gs=applyRotate(cur.shape,cur.rot),maxDx=Math.max(...gs.map(([x])=>x)),gridsX=Math.round((mousex-START_X)/CELL_SIZE-0.5),targetX=gridsX-maxDx;
+    let minDx=Math.min(...gs.map(([x])=>x));targetX=Math.max(-minDx,Math.min(COLS-1-maxDx,targetX));
+    if(cur.x!==targetX){let test=copy(cur);test.x=targetX;test.rot=cur.rot;if(valid(test)){cur.x=targetX;}draw();}
+});
+cvs.addEventListener('wheel',function(e){if(isOpLocked())return;dropDown(2);draw();e.preventDefault();});
+cvs.addEventListener('touchstart',function(ev){if(isOpLocked())return;if(ev.touches.length===1){isDragging=true;dragMoved=false;}});
+cvs.addEventListener('touchmove',function(ev){if(isOpLocked())return;if(ev.touches.length===1){let t=ev.touches[0],rect=cvs.getBoundingClientRect(),tx=t.clientX-rect.left;let gs=applyRotate(cur.shape,cur.rot),maxDx=Math.max(...gs.map(([x])=>x)),gridsX=Math.round((tx-START_X)/CELL_SIZE-0.5),targetX=gridsX-maxDx;let minDx=Math.min(...gs.map(([x])=>x));targetX=Math.max(-minDx,Math.min(COLS-1-maxDx,targetX));if(cur.x!==targetX){let test=copy(cur);test.x=targetX;test.rot=cur.rot;if(valid(test)){cur.x=targetX;}draw();}dragMoved=true;}});
+cvs.addEventListener('touchend',function(ev){if(isOpLocked())return;if(!dragMoved&&ev.changedTouches.length===1){tryMove(0,0,-1); draw();}lastTouchTime = Date.now();ev.preventDefault();isDragging=false;dragMoved=false;});
+cvs.addEventListener('click',function(e){if(isOpLocked())return;if(isMobile() && Date.now()-lastTouchTime<350) return;tryMove(0,0,-1); draw();});
+document.addEventListener('keydown',function(e){
+    if(isOpLocked())return;
+    if(document.activeElement!==document.body&&document.activeElement!==cvs)return;
+    if(e.key==='ArrowLeft')tryMove(-1,0,0),draw();
+    else if(e.key==='ArrowRight')tryMove(1,0,0),draw();
+    else if(e.key==='ArrowDown')dropDown(1),draw();
+    else if(e.key===' ')dropDown(25),draw();
+    else if(e.key==='ArrowUp')tryMove(0,0,1),draw();
+    else if(e.key==='z'||e.key==='Z')tryMove(0,0,-1),draw();
+});
+// -------------------- AI逻辑不变 --------------------
+function aiBoardEval(board){
+    let rows = board.length, cols = board[0].length;
+    let holes = 0, heights = new Array(cols).fill(0);
+    for(let c=0;c<cols;c++){
+        let found = false;
+        for(let r=0;r<rows;r++){
+            if(board[r][c]) found = true;
+            else if(found) holes++;
+        }
+    }
+    for(let c=0;c<cols;c++){
+        for(let r=0;r<rows;r++){
+            if(board[r][c]){heights[c]=rows-r;break;}
+        }
+    }
+    let maxH = Math.max(...heights), minH = Math.min(...heights);
+    let jagged=0;
+    for(let i=1;i<cols;i++) jagged+=Math.abs(heights[i]-heights[i-1]);
+    let fullLines = board.filter(row=>row.every(cell=>cell)).length;
+    return -holes*8 -maxH*0.75 -jagged*1.14 + fullLines*14;
+}
+function aiFindBestMove(piece,board){
+    let bestScore=-1e9,best=null;
+    for(let rot=0;rot<4;rot++){
+        let gs=applyRotate(piece.shape,rot),minDx=Math.min(...gs.map(([x,])=>x)),maxDx=Math.max(...gs.map(([x,])=>x));
+        for(let x=-minDx;x<=COLS-1-maxDx;x++){
+            let py=0;
+            while(true){
+                let ok=true;
+                for(let [dx,dy] of gs){
+                    let xx=x+dx,yy=py+dy;
+                    if(xx<0||xx>=COLS||yy<0||yy>=ROWS) {ok=false;break;}
+                    if(board[yy][xx]) {ok=false;break;}
+                }
+                if(!ok) break;py++;
+            }
+            py--;
+            if(py<0) continue;
+            let testBoard = board.map(row=>row.slice());
+            for(let [dx,dy] of gs){let xx=x+dx,yy=py+dy;if(yy>=0)testBoard[yy][xx]=piece.id;}
+            let tcnt=0,tRows=testBoard.length,tlens=[];
+            for(let r=tRows-1;r>=0;r--)if(testBoard[r].every(cell=>cell)){tcnt++;tlens.push(r);}
+            for(let r of tlens){testBoard.splice(r,1);testBoard.unshift(Array(COLS).fill(null));}
+            let sc=aiBoardEval(testBoard);
+            if(sc>bestScore || (sc==bestScore && x<best.x)){bestScore=sc;best={rot:rot,x:x,y:py};}
+        }
+    }
+    return best;
+}
+function gameLoop(ts){
+    if(!running) return;
+    if(paused){draw();requestId=requestAnimationFrame(gameLoop);return;}
+    if(autoPlaying && !isGameOver){
+        if(!autoTarget){autoTarget=aiFindBestMove(cur,board);autoTickTs=ts;}
+        if(ts-autoTickTs>=dropSpeed){
+            autoTickTs=ts;
+            let moved=false;
+            if((cur.rot||0)!==autoTarget.rot){
+                let diff=(autoTarget.rot-(cur.rot||0)+4)%4;
+                tryMove(0,0,(diff===1||diff===-3)?1:-1);moved=true;
+            }
+            else if(cur.x<autoTarget.x){tryMove(1,0,0);moved=true;}
+            else if(cur.x>autoTarget.x){tryMove(-1,0,0);moved=true;}
+            else {
+                if(tryMove(0,1,0)) moved=true;
+                else{merge();removeLines();newBlock();autoTarget=null;}
+            }
+            draw();
+        }
+        requestId=requestAnimationFrame(gameLoop);return;
+    }
+    if(ts-lastTick>dropSpeed && !isGameOver){
+        if(!tryMove(0,1,0)){merge();removeLines();newBlock();}
+        lastTick=ts;
+    }
+    draw();
+    requestId=requestAnimationFrame(gameLoop);
+}
+function showGameOverModal(){document.getElementById("final-score").textContent=score;document.getElementById("game-over-modal").style.display="flex";}
+function hideGameOverModal(){document.getElementById("game-over-modal").style.display="none";}
+document.getElementById("restart-btn-modal").onclick=()=>{running=true;isGameOver=false;init();};
+document.getElementById("speed-range").addEventListener("input",function(){let idx=Number(this.value);speedMult=SPEED_MULTS[idx];document.getElementById("speed-mult").textContent=speedMult;recalcDropSpeed();});
+document.getElementById("speed-range").value=2;speedMult=SPEED_MULTS[2];document.getElementById("speed-mult").textContent=speedMult;recalcDropSpeed();
+var tipTimer=null;
+function showTip(){clearTimeout(tipTimer);let tip=document.getElementById("game-tip");if(tip){tip.style.opacity="0.91";tip.style.display='block';tipTimer=setTimeout(function(){tip.style.opacity="0";setTimeout(()=>{tip.style.display="none";},800);},4800);}}
+const autoBtn = document.getElementById("auto-btn");
+const autoLabel = document.getElementById("auto-label");
+function setAutoBtnState(on){
+    if(on){
+      autoBtn.innerHTML = `<svg viewBox="0 0 38 38" id="ai-active"><circle cx="19" cy="19" r="15" stroke="#72fa9b" stroke-width="3" fill="#2aee7c"/><ellipse cx="12.3" cy="22" rx="2" ry="2.9" fill="#fff" stroke="#4fc251" stroke-width="1.1"/><ellipse cx="25.7" cy="22" rx="2" ry="2.9" fill="#fff" stroke="#4fc251" stroke-width="1.1"/><ellipse cx="19" cy="17.8" rx="5.5" ry="4.1" fill="#97ffb8" stroke="#fff" stroke-width="0.95"/><rect x="14" y="25.2" width="10" height="3.5" rx="1.1" fill="#fff"/><rect x="7.8" y="15" width="22.4" height="2.2" rx="0.7" fill="#59d46a"/><rect x="11.7" y="6.3" width="2" height="5" rx="1.1" fill="#afd97f" transform="rotate(-28 13 9)"/><rect x="24.3" y="6.3" width="2" height="5" rx="1.1" fill="#afd97f" transform="rotate(28 25 9)"/></svg>`;
+      autoBtn.classList.add("active");autoBtn.setAttribute('aria-pressed',true);
+      autoLabel.textContent = "自动中";
+    }else{
+      autoBtn.innerHTML = `<svg viewBox="0 0 36 36" id="ai-inactive"><circle cx="18" cy="18" r="15" stroke="#aaa" stroke-width="2.8" fill="none"/><rect x="21" y="6" width="6" height="8" rx="2" fill="#aaa" transform="rotate(45 24 10)"/><circle cx="12" cy="25" r="4" fill="#b0b0b0" stroke="#ededed" stroke-width="0.9"/><rect x="11" y="15" width="2.5" height="9" rx="1.17" fill="#aaa" transform="rotate(23 12.25 19.5)"/></svg>`;
+      autoBtn.classList.remove("active");autoBtn.setAttribute('aria-pressed',false);
+      autoLabel.textContent = "自动";
+    }
+}
+const pauseBtn = document.getElementById("pause-btn");
+const pauseLabel = document.getElementById("pause-label");
+function setPauseBtnState(paused){
+    if(paused){
+        pauseBtn.innerHTML = `<svg id="play-svg" viewBox="0 0 38 38"><circle cx="19" cy="19" r="15" stroke="#fff" stroke-width="3" fill="none"/><polygon points="14,10 28,19 14,28" fill="#fff"/></svg>`;
+        pauseLabel.textContent = "继续";
+    }else{
+        pauseBtn.innerHTML = `<svg id="pause-svg" viewBox="0 0 38 38"><circle cx="19" cy="19" r="15" stroke="#fff" stroke-width="3" fill="none"/><rect x="13" y="10" width="4.9" height="18" rx="1.7" fill="#fff"/><rect x="20" y="10" width="4.9" height="18" rx="1.7" fill="#fff"/></svg>`;
+        pauseLabel.textContent = "暂停";
+    }
+}
+autoBtn.onclick = function(){
+    if(autoPlaying){
+        autoPlaying = false;
+        setAutoBtnState(false);
+        autoTarget=null;
+    }else{
+        paused = false;
+        setPauseBtnState(false);
+        pauseBtn.setAttribute('aria-pressed',"false");
+        pauseBtn.classList.remove("active");
+        autoPlaying = true;
+        setAutoBtnState(true);
+        autoTarget=null;
+    }
+};
+pauseBtn.onclick = function(){
+    if(autoPlaying) return;
+    paused = !paused;
+    this.setAttribute('aria-pressed',paused);
+    setPauseBtnState(paused);
+    if(paused){this.classList.add("active");}else{this.classList.remove("active");}
+};
+(function() {
+  var sc=document.getElementById('speed-control-container');
+  var speedIcon=document.getElementById('speed-control-icon');
+  var speedWrap=document.getElementById('speed-control-wrap');
+  var panelJustOpened=false;
+  var controlPanel=document.getElementById('control-panel');
+  function openPanel() {
+    sc.classList.add('panel-open');
+    if(isMobile()) controlPanel.classList.add("mobile-hide");
+    panelJustOpened = true;
+    setTimeout(()=>{ panelJustOpened = false; }, 100);
+  }
+  function closePanel() {
+    sc.classList.remove('panel-open');
+    if(isMobile()) controlPanel.classList.remove("mobile-hide");
+    document.removeEventListener('mousedown', handlerOuterClick, true);
+  }
+  speedIcon.addEventListener('click', function(ev) {
+    ev.preventDefault(); ev.stopPropagation();
+    openPanel();
+    document.addEventListener('mousedown', handlerOuterClick, true);
+  });
+  function handlerOuterClick(ev) {
+    if(!sc.contains(ev.target) && sc.classList.contains('panel-open')) {
+      closePanel();
+    }
+  }
+  speedWrap.addEventListener('mousedown', function (ev) {ev.stopPropagation();});
+  if (isMobile()) {
+    speedIcon.addEventListener('touchstart', function(ev){
+      openPanel();
+      ev.preventDefault(); ev.stopPropagation();
+    });
+    document.addEventListener('touchstart', function(ev){
+      var path = ev.composedPath ? ev.composedPath() : (ev.path || []);
+      if(!path.includes(sc) && sc.classList.contains('panel-open')) {
+        closePanel();
+      }
+    });
+    speedWrap.addEventListener('touchstart', function(ev){ev.stopPropagation();});
+  }
+})();
+function init(){
+    recomputeGridLayout();
+    board=createBoard();cur=randomPiece();next=randomPiece();
+    score=0;level=0;isGameOver=0;running=1;lastTick=performance.now();recalcDropSpeed();
+    paused=false;autoPlaying=false;setAutoBtnState(false);autoTarget=null;
+    pauseBtn.setAttribute("aria-pressed","false");
+    pauseBtn.classList.remove("active");
+    setPauseBtnState(false);
+    hideGameOverModal();draw();showTip();
+    requestId=requestAnimationFrame(gameLoop);
+}
+window.addEventListener("resize",()=>{recomputeGridLayout();draw();});
+window.addEventListener("orientationchange",()=>setTimeout(()=>{recomputeGridLayout();draw();},150));
+setTimeout(()=>{init();},60);
+</script>
+
+
+
+
+
+    <!-- 直接插入菜单HTML，复制到每个页面！ -->
+    <div class="floating-nav">
+        <ul class="nav-list">
+            <li><i class="fas fa-home"></i><a href="index.html">首页</a></li>
+            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
+            <li class="main-menu">
+                <i class="fas fa-gamepad"></i>
+                <span>解压游戏</span>
+            </li>
+            <li><i class="fas fa-bug"></i><a href="mifeng.html">蜜蜂大冒险</a></li>
+            <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
+            <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
+
+        </ul>
+    </div>
+
+
+
+
+</body>
+</html>
