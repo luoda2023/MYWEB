@@ -175,7 +175,8 @@
         box-shadow: 0 0 0 transparent;
     }
     .nav-links .nav-app-btn,
-    .nav-links .nav-wechat-btn {
+    .nav-links .nav-wechat-btn,
+    .nav-links .nav-qrcode-btn {
         font-weight: 400 !important;
         font-size: 0.97rem !important;
         padding: 0.48rem 1.0rem !important;
@@ -1021,17 +1022,13 @@
                     扫码下载
                     <span class="sweep-light"></span>
                 </a>
-                <a href="javascript:void(0);" class="nav-wechat-btn nav-btn-base" id="nav-wechat-btn">
+            <div class="nav-links" style="position:relative;">
+                <a href="https://qa.dicad.cn" class="nav-qrcode-btn nav-btn-base" id="nav-qrcode-btn" target="_blank" rel="noopener">
                     <span class="icon" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                            <ellipse cx="11" cy="11" rx="10" ry="10" stroke="currentColor" stroke-width="1.6" fill="none"/>
-                            <ellipse cx="14.5" cy="13" rx="4" ry="3.7" stroke="currentColor" stroke-width="1.1" fill="none"/>
-                            <ellipse cx="7.3" cy="8.9" rx="4" ry="4" stroke="currentColor" stroke-width="1.1" fill="none"/>
-                            <circle cx="8.2" cy="11" r="0.56" fill="currentColor"/>
-                            <circle cx="13.2" cy="14.4" r="0.64" fill="currentColor"/>
-                        </svg>
+                        <!-- 新图标: fa-question-circle -->
+                        <i class="fas fa-question-circle"></i>
                     </span>
-                    添加微信
+                    Q&A问答
                     <span class="sweep-light"></span>
                 </a>
                 <!-- PC端“解压游戏”按钮，紧挨添加微信右侧 -->
@@ -1625,6 +1622,7 @@
             <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
             <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
             <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
+            <li><i class="fas fa-question-circle"></i><a href="https://qa.dicad.cn" target="_blank">Q&amp;A问答</a></li>
         </ul>
     </div>
 
