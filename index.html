@@ -1063,6 +1063,7 @@
                     <button class="unzip-menu-item" id="unzip-menu-shuzhi-mobile">数字滑块拼图</button>
                     <button class="unzip-menu-item" id="unzip-menu-100-mobile">AI算命</button>
                     <button class="unzip-menu-item" id="unzip-menu-fangkuai-mobile">AI成语方块消消乐</button>
+					<button class="unzip-menu-item" id="unzip-menu-fangkuai-mobile2"><i class="fas fa-question-circle"></i> Q&A问题</button>
 
                 </div>
                 </div>
@@ -1491,6 +1492,9 @@
         function goTofangkuaiGame() {
             window.location.href = 'fangkuai.html';
         }
+		function goTofangkuaiGame2() {
+		    window.location.href = 'https://qa.dicad.cn';
+		}
 
         // PC端事件
         var pcBtn = document.getElementById('nav-unzip-btn-pc');
@@ -1524,6 +1528,7 @@
                 hideUnzipMenu('pc');
                 goTofangkuaiGame();
             };
+			
             // 点击外部关闭菜单
             document.addEventListener('mousedown', function(e){
                 if(!isMobile() && pcMenu.classList.contains('show')) {
@@ -1582,6 +1587,11 @@
                 hideUnzipMenu('mobile');
                 goTofangkuaiGame();
             };
+			document.getElementById('unzip-menu-fangkuai-mobile2').onclick = function(e){
+			    e.preventDefault();
+			    hideUnzipMenu('mobile');
+			    goTofangkuaiGame2();
+			};
             document.addEventListener('mousedown', function(e){
                 if(isMobile() && mobileMenu.classList.contains('show')) {
                     if(!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
@@ -1613,7 +1623,7 @@
     <!-- 直接插入菜单HTML，复制到每个页面！ -->
     <div class="floating-nav">
         <ul class="nav-list">
-            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
+
             <li class="main-menu">
                 <i class="fas fa-gamepad"></i>
                 <span>解压游戏</span>
@@ -1622,7 +1632,7 @@
             <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
             <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
             <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
-            <li><i class="fas fa-question-circle"></i><a href="https://qa.dicad.cn" target="_blank">Q&amp;A问答</a></li>
+
         </ul>
     </div>
 
