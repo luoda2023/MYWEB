@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUODA 罗达 - AI赋能工程设计</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;background:#02030d;color:#fff;min-height:100vh;position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at top right,rgba(168,85,247,.18),transparent 35%),radial-gradient(circle at bottom left,rgba(59,130,246,.15),transparent 35%);pointer-events:none;z-index:0}
+.bg-main{position:fixed;inset:0;background:url("bg.jpg") center center/cover no-repeat;opacity:.45;z-index:0}
+.grid-overlay{position:fixed;inset:0;background-image:linear-gradient(rgba(168,85,247,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(168,85,247,.08) 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent);z-index:0;animation:border-pulse 8s ease-in-out infinite}
+#particleCanvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+/* Header */
+header{position:relative;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:rgba(2,3,13,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(168,85,247,.15)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:17px;color:#fff;box-shadow:0 0 16px rgba(168,85,247,.45);animation:pulse-glow 4s ease-in-out infinite}
+.logo-text h1{font-size:16px;font-weight:700}
+.logo-text p{font-size:10px;color:#b7b7c9}
+.header-right{display:flex;align-items:center;gap:10px}
+.phone-btn{padding:7px 14px;border-radius:20px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);backdrop-filter:blur(10px);color:#fff;text-decoration:none;font-size:12px;transition:.3s;white-space:nowrap}
+.phone-btn:hover{background:rgba(168,85,247,.3)}
+.wechat-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(7,193,96,.1);border:1px solid rgba(7,193,96,.3);cursor:pointer;transition:all .35s;flex-shrink:0}
+.wechat-btn:hover{background:rgba(7,193,96,.22);transform:translateY(-2px);box-shadow:0 0 22px rgba(7,193,96,.35)}
+.wechat-icon{width:18px;height:18px}
+
+/* Hero */
+.hero-wrap{position:relative;z-index:5;padding:20px 16px 0;display:flex;align-items:flex-start;gap:12px}
+.hero-text{flex:1;min-width:0}
+.hero-text h2{font-size:26px;line-height:1.15;margin-bottom:6px;font-weight:700;animation:fadeInUp .8s ease-out}
+.hero-text .subtitle{font-size:13px;color:#d946ef;margin-bottom:12px;font-weight:500;animation:fadeInUp .8s ease-out .15s both}
+.hero-text p{color:#c5c5d5;line-height:1.8;font-size:13px;animation:fadeInUp .8s ease-out .3s both}
+.robot-img{width:120px;height:auto;flex-shrink:0;animation:float 5s ease-in-out infinite;opacity:.85;filter:drop-shadow(0 0 18px rgba(168,85,247,.4));margin-top:4px}
+.hero-buttons{margin-top:18px;display:flex;gap:12px;animation:fadeInUp .8s ease-out .45s both}
+.btn-primary,.btn-secondary{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:.3s}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#a855f7);color:#fff;box-shadow:0 0 16px rgba(168,85,247,.3);animation:pulse-glow 3.5s ease-in-out infinite}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(168,85,247,.6)}
+.btn-secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(10px)}
+.btn-secondary:hover{background:rgba(255,255,255,.12)}
+
+/* Stats */
+.stats-bar{padding:18px 16px 0;position:relative;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:10px;animation:fadeInUp .7s ease-out .6s both}
+.stat-item{display:flex;align-items:center;gap:10px;background:rgba(15,18,35,.7);border:1px solid rgba(168,85,247,.18);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px)}
+.stat-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.3);font-size:14px;flex-shrink:0}
+.stat-text .num{font-size:18px;font-weight:bold}
+.stat-text .label{font-size:11px;color:#aaa}
+
+/* Sections */
+.section{padding:18px 16px 0;position:relative;z-index:5}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-header h3{font-size:15px;display:flex;align-items:center;gap:6px}
+.section-header h3::before{content:"";width:14px;height:14px;border-left:2px solid #a855f7;border-top:2px solid #a855f7}
+.view-more{color:#c084fc;text-decoration:none;font-size:12px}
+
+/* Business cards 2 columns */
+.business-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.business-card{background:rgba(15,18,35,.72);border:1px solid rgba(168,85,247,.22);border-radius:12px;padding:14px 12px;transition:.3s;overflow:hidden;position:relative}
+.business-card::after{content:"";position:absolute;top:-50%;left:-80%;width:50%;height:200%;background:linear-gradient(105deg,transparent 35%,rgba(168,85,247,.08) 42%,rgba(168,85,247,.2) 48%,rgba(168,85,247,.08) 54%,transparent 65%);pointer-events:none;transform:rotate(28deg)}
+.business-card:hover{transform:translateY(-3px);border-color:rgba(168,85,247,.6);box-shadow:0 0 20px rgba(168,85,247,.2),inset 0 0 14px rgba(168,85,247,.04)}
+.business-card:hover::after{animation:scan .65s ease-in-out}
+.card-icon{width:44px;height:44px;border-radius:10px;background:rgba(168,85,247,.12);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px}
+.card-title{font-size:14px;margin-bottom:6px}
+.card-desc{font-size:11px;line-height:1.65;color:#a9abc3}
+
+/* AI cards 3+2 */
+.col-grid-ai{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.col-card-ai{background:rgba(15,18,35,.75);border:1px solid rgba(168,85,247,.2);border-radius:10px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px 8px;transition:.3s;overflow:hidden;position:relative}
+.col-card-ai::after{content:"";position:absolute;top:-50%;left:-80%;width:50%;height:200%;background:linear-gradient(105deg,transparent 35%,rgba(168,85,247,.08) 42%,rgba(168,85,247,.2) 48%,rgba(168,85,247,.08) 54%,transparent 65%);pointer-events:none;transform:rotate(28deg)}
+.col-card-ai:hover{transform:translateY(-3px) scale(1.03);border-color:rgba(168,85,247,.7);box-shadow:0 0 18px rgba(168,85,247,.25),inset 0 0 10px rgba(168,85,247,.04)}
+.col-card-ai:hover::after{animation:scan .65s ease-in-out}
+.col-card-ai .icon{width:40px;height:40px;border-radius:50%;background:rgba(168,85,247,.12);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px}
+.col-card-ai span{font-size:12px;color:#d8d8e8;text-align:center}
+
+/* Case cards 2x2 */
+.col-grid-case{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.col-card-case{overflow:hidden;border-radius:10px;background:rgba(15,18,35,.75);border:1px solid rgba(168,85,247,.2);transition:.3s}
+.col-card-case:hover{transform:translateY(-3px);border-color:rgba(168,85,247,.55);box-shadow:0 0 16px rgba(168,85,247,.2)}
+.case-img{width:100%;height:90px;background-size:cover;background-position:center}
+.case-text{padding:8px;font-size:11px;text-align:center;line-height:1.5;color:#ddd}
+
+/* Game cards 2x2 */
+.col-grid-game{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.col-card-game{text-decoration:none;color:#fff;background:rgba(15,18,35,.75);border:1px solid rgba(168,85,247,.2);border-radius:10px;display:flex;align-items:center;padding:0 12px;gap:10px;height:50px;transition:.3s}
+.col-card-game:hover{transform:translateX(3px);border-color:rgba(168,85,247,.6);box-shadow:0 0 14px rgba(168,85,247,.18)}
+.col-card-game .icon{width:26px;height:26px;border-radius:50%;background:rgba(168,85,247,.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.col-card-game span{font-size:12px}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(8px)}
+.modal-content{width:92%;max-height:82vh;overflow:auto;background:rgba(12,14,28,.96);border:1px solid rgba(168,85,247,.35);border-radius:16px;padding:20px 16px;position:relative;box-shadow:0 0 32px rgba(168,85,247,.22)}
+.modal-content h2{margin-bottom:14px;font-size:20px}
+.modal-content p,#modalText{color:#d0d3e4;line-height:1.9;white-space:pre-line;font-size:13px}
+.close-btn{position:absolute;right:14px;top:10px;font-size:24px;cursor:pointer;color:#fff}
+.big-qr{width:220px;height:220px;object-fit:cover;border-radius:10px;margin:14px auto;display:block}
+.qr-modal{text-align:center}
+
+/* Animations */
+@keyframes border-pulse{0%,100%{border-color:rgba(168,85,247,.2)}50%{border-color:rgba(168,85,247,.55)}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 14px rgba(168,85,247,.25)}50%{box-shadow:0 0 28px rgba(168,85,247,.5),0 0 50px rgba(168,85,247,.15)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes scan{0%{transform:translateX(-120%) translateY(-120%) rotate(28deg)}100%{transform:translateX(160%) translateY(160%) rotate(28deg)}}
+@keyframes ripple-out{0%{inset:-4px;opacity:1}100%{inset:-18px;opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="bg-main"></div>
+<div class="grid-overlay"></div>
+<canvas id="particleCanvas"></canvas>
+
+<header>
+<div class="logo">
+    <div class="logo-icon">L</div>
+    <div class="logo-text">
+        <h1>LUODA</h1>
+        <p>AI赋能工程设计</p>
+    </div>
+</div>
+<div class="header-right">
+    <a href="tel:17373913119" class="phone-btn">📞 173 7391 3119</a>
+    <a href="javascript:void(0)" class="wechat-btn" onclick="openWechatModal()">
+        <svg class="wechat-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 5.87 2 10.5c0 2.5 1.4 4.7 3.5 6.1a.6.6 0 0 1 .2.6l-.7 2c-.1.3.2.6.5.5l2.8-1.3c.2-.1.5-.1.7 0 .9.3 2 .5 3 .5 5.5 0 10-3.8 10-8.5S17.52 2 12 2z" fill="#07C160"/><circle cx="8.5" cy="9.5" r="1.3" fill="white"/><circle cx="15.5" cy="9.5" r="1.3" fill="white"/></svg>
+    </a>
+</div>
+</header>
+
+<div class="hero-wrap">
+<div class="hero-text">
+    <h2>AI赋能工程设计</h2>
+    <div class="subtitle">LET IMAGINATION BECOME REALITY</div>
+    <p>AI与工程设计深度融合，打造更智能、更高效的未来建设方式。为城市发展与产业升级提供全生命周期解决方案。</p>
+    <div class="hero-buttons">
+        <button class="btn-primary">探索业务</button>
+        <button class="btn-secondary">合作咨询</button>
+    </div>
+
+<div class="stats-bar">
+<div class="stat-item"><div class="stat-icon">🏢</div><div class="stat-text"><div class="num">300+</div><div class="label">项目经验</div></div></div>
+<div class="stat-item"><div class="stat-icon">👥</div><div class="stat-text"><div class="num">200+</div><div class="label">专业团队</div></div></div>
+<div class="stat-item"><div class="stat-icon">🤝</div><div class="stat-text"><div class="num">500+</div><div class="label">合作客户</div></div></div>
+<div class="stat-item"><div class="stat-icon">✅</div><div class="stat-text"><div class="num">100%</div><div class="label">质量保障</div></div></div>
+</div>
+
+<div class="section">
+<div class="section-header"><h3>六大业务领域</h3><a href="#" class="view-more">查看全部 →</a></div>
+<div class="business-grid">
+<div class="business-card" onclick="openDetail(this.querySelector('.card-title').innerText)"><div class="card-icon">🏢</div><div class="card-title">工程设计</div><div class="card-desc">市政/公路/建筑/园林<br>水利/水厂</div></div>
+<div class="business-card" onclick="openDetail(this.querySelector('.card-title').innerText)"><div class="card-icon">⚡</div><div class="card-title">电力工程</div><div class="card-desc">送电/输电/光伏<br>风电/储能/变电站</div></div>
+<div class="business-card" onclick="openDetail(this.querySelector('.card-title').innerText)"><div class="card-icon">🗄️</div><div class="card-title">大数据机房</div><div class="card-desc">规划/施工/服务器<br>布线/空调/供配电</div></div>
+<div class="business-card" onclick="openDetail(this.querySelector('.card-title').innerText)"><div class="card-icon">🤖</div><div class="card-title">智慧安装</div><div class="card-desc">停车/工厂/楼宇<br>安防/能源/消防</div></div>
+<div class="business-card" onclick="openDetail(this.querySelector('.card-title').innerText)"><div class="card-icon">💻</div><div class="card-title">软件开发</div><div class="card-desc">管理系统/APP/AI<br>可视化/IOT/网站</div></div>
+<div class="business-card" onclick="openDetail(this.querySelector('.card-title').innerText)"><div class="card-icon">🚀</div><div class="card-title">诚邀合作</div><div class="card-desc">项目合作/团队加入<br>资源介绍/技术合作</div></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-header"><h3>AI赋能力</h3></div>
+<div class="col-grid-ai">
+<div class="col-card-ai" onclick="openDetail(this.querySelector('span').innerText)"><div class="icon">📄</div><span>AI写标书</span></div>
+<div class="col-card-ai" onclick="openDetail(this.querySelector('span').innerText)"><div class="icon">✏️</div><span>AI写说明</span></div>
+<div class="col-card-ai" onclick="openDetail(this.querySelector('span').innerText)"><div class="icon">🖼️</div><span>AI画图</span></div>
+<div class="col-card-ai" onclick="openDetail(this.querySelector('span').innerText)"><div class="icon">📦</div><span>AI算量</span></div>
+<div class="col-card-ai" onclick="openDetail(this.querySelector('span').innerText)"><div class="icon">🚀</div><span>AI概算</span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-header"><h3>项目案例</h3><a href="#" class="view-more">查看全部 →</a></div>
+<div class="col-grid-case">
+<div class="col-card-case"><div class="case-img" style="background-image:url('https://picsum.photos/400/300?1')"></div><div class="case-text">智慧水务厂站工程</div></div>
+<div class="col-card-case"><div class="case-img" style="background-image:url('https://picsum.photos/400/300?2')"></div><div class="case-text">智慧园区综合体项目</div></div>
+<div class="col-card-case"><div class="case-img" style="background-image:url('https://picsum.photos/400/300?3')"></div><div class="case-text">轨道交通枢纽工程</div></div>
+<div class="col-card-case"><div class="case-img" style="background-image:url('https://picsum.photos/400/300?4')"></div><div class="case-text">大型数据中心机房</div></div>
+</div>
+</div>
+
+<div class="section" style="padding-bottom:24px">
+<div class="section-header"><h3>趣味游戏</h3></div>
+<div class="col-grid-game">
+<a href="mifeng.html" target="_blank" class="col-card-game"><div class="icon">🐝</div><span>蜜蜂冒险</span></a>
+<a href="shuzhi.html" target="_blank" class="col-card-game"><div class="icon">🧩</div><span>数字拼图</span></a>
+<a href="100qian.html" target="_blank" class="col-card-game"><div class="icon">🔮</div><span>AI算命</span></a>
+<a href="fangkuai.html" target="_blank" class="col-card-game"><div class="icon">🧊</div><span>开心消消乐</span></a>
+</div>
+</div>
+
+<!-- 微信二维码弹窗 -->
+<div class="modal" id="wechatModal">
+    <div class="modal-content qr-modal">
+        <span class="close-btn" onclick="closeWechatModal()">×</span>
+        <h2>微信扫码咨询</h2>
+        <img src="lx.png" class="big-qr" alt="微信二维码">
+        <p>添加微信获取更多工程设计与AI赋能解决方案。</p>
+    </div>
+</div>
+
+<!-- 通用详情弹窗 -->
+<div class="modal" id="detailModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeDetailModal()">×</span>
+        <h2 id="modalTitle"></h2>
+        <div id="modalText"></div>
+    </div>
+</div>
+
+<script>
+var detailData={
+"工程设计":`LUODA 提供覆盖全过程的综合工程设计服务，重点涵盖：
+
+• 市政给排水工程
+• 长距离输水工程
+• 水厂与污水厂设计
+• 建筑与结构工程
+• 园林景观工程
+• BIM协同设计
+• 智慧水务系统
+• 海绵城市建设
+
+公司结合AI智能辅助设计系统，可快速进行方案比选、水力计算、工程量分析、管网优化、节能分析与风险预测。
+
+通过数字化与智能化设计手段，大幅提高设计效率、降低设计错误率，并帮助业主实现更高效的项目管理与运维。`,
+
+"电力工程":`LUODA 提供新能源与电力系统整体解决方案，服务内容包括：
+
+• 光伏发电系统设计
+• 风力发电工程
+• 输变电工程
+• 储能系统建设
+• 智能配电系统
+• 电力监控平台
+• 高低压配电设计
+• 能源管理系统
+
+依托AI算法平台，可对负荷、能耗与发电效率进行智能分析，实现电力负荷预测、储能优化控制、节能优化与故障预警。`,
+
+"大数据机房":`LUODA 提供现代化数据中心与AI算力中心整体建设服务，包括：
+
+• 数据中心规划设计
+• AI算力中心建设
+• 服务器机房工程
+• 综合布线系统
+• UPS供配电系统
+• 精密空调系统
+• 动环监控系统
+• 网络与安全系统
+
+针对高密度算力需求，可提供机房节能优化、冷热通道分析、AI能耗监测与智慧运维平台。`,
+
+"智慧安装":`融合AI、物联网与自动化控制技术，打造现代智慧化系统：
+
+• 智慧园区
+• 智慧工厂
+• 智慧楼宇
+• 智慧停车
+• 智慧能源
+• 智慧消防
+• 智能安防系统
+• 远程监控平台
+
+通过多种传感器与AI分析平台，实现实时数据采集、智能联动控制、能耗分析与安全预警。`,
+
+"软件开发":`LUODA 提供企业级软件平台与AI系统开发服务：
+
+• 企业管理系统
+• AI智能平台
+• APP与小程序
+• 可视化大屏系统
+• 智慧运维平台
+• BIM管理系统
+• 数据分析平台
+• 物联网平台
+
+同时结合AI技术实现AI数据分析、AI文本生成、AI图像识别与智能问答系统。`,
+
+"诚邀合作":`LUODA 欢迎全国合作伙伴共同发展智慧工程生态。
+
+合作方向包括：
+
+• 工程项目合作
+• 技术联合开发
+• AI平台共建
+• 智慧运维合作
+• 区域资源合作
+• 团队联合运营
+• 软件系统合作
+• 数据平台合作
+
+我们致力于打造AI工程设计生态，推动智慧化建设升级。`,
+
+"AI写标书":`通过AI自动生成投标文件、商务标、技术标及施工组织方案。系统支持自动目录生成、规范格式排版、技术方案生成、历史案例调用与AI语言优化，大幅提高投标效率。`,
+
+"AI写说明":`AI自动生成设计说明、施工说明、汇报材料与技术文档。支持给排水设计说明、电气设计说明、施工方案编写、项目汇报材料与PPT内容生成。`,
+
+"AI画图":`基于AI生成概念效果图、辅助设计图与方案表达图。支持建筑概念图、景观效果图、工业园区方案图与AI风格化表达。`,
+
+"AI算量":`自动识别工程图纸并完成工程量统计与清单分析。支持管道算量、土方统计、材料统计、工程量汇总与AI图纸识别。`,
+
+"AI概算":`基于历史工程数据库与AI模型进行智能概算分析。支持投资估算、成本分析、工程指标比对、AI价格预测与风险评估。`,
+
+"蜜蜂冒险":`一款轻松有趣的休闲小游戏，可用于展示AI互动与网页娱乐功能结合能力。`,
+"数字拼图":`支持数字逻辑训练与互动体验，可作为智慧平台小游戏模块扩展。`,
+"AI算命":`基于AI文本生成的趣味互动功能，可扩展为AI问答娱乐模块。`,
+"开心消消乐":`经典休闲玩法展示，用于增强平台互动性与趣味体验。`
+};
+
+function openWechatModal(){document.getElementById('wechatModal').style.display='flex'}
+function closeWechatModal(){document.getElementById('wechatModal').style.display='none'}
+function openDetail(title){document.getElementById('modalTitle').innerText=title;document.getElementById('modalText').innerText=detailData[title]||'暂无详细介绍';document.getElementById('detailModal').style.display='flex'}
+function closeDetailModal(){document.getElementById('detailModal').style.display='none'}
+window.onclick=function(e){
+  if(e.target===document.getElementById('wechatModal'))document.getElementById('wechatModal').style.display='none';
+  if(e.target===document.getElementById('detailModal'))document.getElementById('detailModal').style.display='none';
+}
+
+/* Particle Network Canvas */
+(function(){
+  var cvs=document.getElementById('particleCanvas');
+  if(!cvs)return;
+  var ctx=cvs.getContext('2d');
+  var W,H,dots=[];
+  var N=20,MAX_D=100;
+  function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<N;i++){
+    dots.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45,r:Math.random()*1.4+.6});
+  }
+  var mx=-999,my=-999;
+  window.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
+  window.addEventListener('touchmove',function(e){if(e.touches[0]){mx=e.touches[0].clientX;my=e.touches[0].clientY}});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<N;i++){
+      var d=dots[i];
+      var dxc=mx-d.x,dyc=my-d.y,dc=Math.sqrt(dxc*dxc+dyc*dyc);
+      if(dc<150&&dc>1){d.vx+=dxc/dc*.005;d.vy+=dyc/dc*.005}
+      d.x+=d.vx;d.y+=d.vy;
+      if(d.x<0||d.x>W)d.vx*=-1;
+      if(d.y<0||d.y>H)d.vy*=-1;
+      d.vx*=.996;d.vy*=.996;
+      ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(168,85,247,.28)';ctx.fill();
+      for(var j=i+1;j<N;j++){
+        var o=dots[j];
+        var dx=o.x-d.x,dy=o.y-d.y,dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<MAX_D){ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(o.x,o.y);ctx.strokeStyle='rgba(168,85,247,'+((1-dist/MAX_D)*.15)+')';ctx.lineWidth=.5;ctx.stroke()}
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -9,54 +9,64 @@
   <style>
 
 
-        /* 菜单CSS */
-        .floating-nav {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            background-color: #1E3A5F;
-            border-radius: 8px 0 0 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            overflow: hidden;
-            transition: width 0.3s;
-            width: 50px;
-            z-index: 9999;
+        /* 返回首页链接 */
+        .back-home {
+          position: fixed;
+          top: 18px;
+          left: 18px;
+          z-index: 10000;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 18px;
+          background: rgba(168,85,247,0.18);
+          color: rgba(168,85,247,0.85);
+          border: 1px solid rgba(168,85,247,0.35);
+          border-radius: 10px;
+          font-size: 15px;
+          font-weight: 500;
+          text-decoration: none;
+          backdrop-filter: blur(6px);
+          transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
+          cursor: pointer;
+          letter-spacing: 0.5px;
         }
-        .floating-nav:hover { width:250px; }
-        .nav-list {list-style: none; margin:0; padding:0;}
-        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
-        .nav-list li:hover {background:#5E8BFF;}
-        .nav-list li i {font-size:18px; color:#4ECDC4;}
-        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
-        .floating-nav:hover .nav-list li a, 
-        .floating-nav:hover .nav-list li span {opacity:1;}
-        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
-        @media (max-width:768px){.floating-nav{display:none;}}
-        /* 下面放你的其他body样式... */
-
-
+        .back-home:hover {
+          background: rgba(168,85,247,0.55);
+          color: #fff;
+          border-color: rgba(168,85,247,0.9);
+          box-shadow: 0 0 18px rgba(168,85,247,0.45);
+        }
+        @media (max-width:540px){
+          .back-home {top:10px;left:10px;font-size:13px;padding:6px 12px;}
+        }
 
 
 :root {
   --color-sign-up: #fc4254;
   --color-sign-mid: #e0b000;
   --color-sign-down: #439efa;
+  --purple-main: rgba(168,85,247,0.85);
+  --purple-border: rgba(168,85,247,0.45);
+  --purple-glow: 0 0 18px rgba(168,85,247,0.25), 0 0 40px rgba(168,85,247,0.10);
+  --dark-bg: #02030d;
+  --dark-card: rgba(10,8,28,0.82);
+  --dark-text: #e6e0f6;
+  --dark-text-sec: #a99ed6;
 }
 html,body {
-  margin:0;padding:0; /* 保证无滚动条 */
+  margin:0;padding:0;
   font-family:'Helvetica Neue','PingFang SC','Microsoft YaHei',Arial,sans-serif;
-  background:#fff;color:#222;
+  background: var(--dark-bg);
+  color: var(--dark-text);
 }
 body{min-height:100vh;overflow-x:hidden;}
-#bg-canvas, #bg-clouds {
-  position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:0;pointer-events:none;
-}
 #bg-canvas {
-  opacity:0.07;
+  position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:0;pointer-events:none;
+  opacity:1;
 }
 #bg-clouds {
-  opacity:0.35;
+  display:none;
 }
 .main-logo,
 .card-ctrlwrap,
@@ -71,24 +81,26 @@ body{min-height:100vh;overflow-x:hidden;}
   max-width: 70vw;
 }
 .main-logo{margin:32px auto 18px auto;text-align:center;}
-.main-logo img{width:76px;height:76px;opacity:0.32;}
+.main-logo img{width:76px;height:76px;opacity:0.32;filter:brightness(2.5) hue-rotate(260deg) saturate(0.6);}
 .card-ctrlwrap{
-  background:#f7f8fa; border-radius:18px; box-shadow:0 2px 8px #e4e8f02c;
-  border:1px solid #ececec; margin:30px auto 0 auto;
+  background: var(--dark-card); border-radius:18px; box-shadow: var(--purple-glow);
+  border:1px solid var(--purple-border); margin:30px auto 0 auto;
   padding:18px 26px; display:flex; align-items:center; gap:13px; flex-wrap:wrap; min-height:60px; position:relative; z-index:2;
   justify-content: flex-start;
+  backdrop-filter: blur(8px);
 }
-.dropdown-label{ margin-right:10px;font-size:16px;white-space:nowrap;color:#484350;font-weight:500; }
+.dropdown-label{ margin-right:10px;font-size:16px;white-space:nowrap;color:var(--dark-text-sec);font-weight:500; }
 .dropdown-wrap { flex:1; min-width:130px;}
 .dropdown {
-  font-size:1em; border: 1.2px solid #b0b0b0; border-radius: 7px; padding: 10px 13px;
-  min-width: 100px; color: #222; background: #fff;
+  font-size:1em; border: 1.2px solid var(--purple-border); border-radius: 7px; padding: 10px 13px;
+  min-width: 100px; color: var(--dark-text); background: rgba(20,14,45,0.85);
   appearance: none; cursor:pointer;outline:none;
 }
+.dropdown option { background:#120e2d; color:var(--dark-text); }
 .stat-inline {
   display: flex; align-items: center; gap:7px;margin-left:12px;margin-right:0;font-size:15px;
 }
-.stat-inline .statlabel {font-size:15px;color:#bd9a9a;margin:0;}
+.stat-inline .statlabel {font-size:15px;color:var(--dark-text-sec);margin:0;}
 .stat-inline .statnum   {font-weight:bold;font-size:19px;margin:0 3px;}
 .statnum.up   { color: var(--color-sign-up);}
 .statnum.mid  { color: var(--color-sign-mid);}
@@ -110,20 +122,25 @@ body{min-height:100vh;overflow-x:hidden;}
   justify-content: center;
   gap: 8px;
   font-size: 18px;
-  border: 1.7px solid #ccc;
+  border: 1.7px solid var(--purple-border);
   border-radius: 10px;
   padding: 10px 21px;
-  background: #ffffff;
-  color: #222;
+  background: linear-gradient(135deg, rgba(168,85,247,0.22) 0%, rgba(120,50,220,0.18) 100%);
+  color: var(--dark-text);
   font-weight: 550;
   cursor: pointer;
   transition: .17s;
   letter-spacing: 1.1px;
-  box-shadow: 0 1.8px 8px #e5e5e7;
+  box-shadow: 0 1.8px 8px rgba(168,85,247,0.10);
   min-width: 0;
   white-space: nowrap;
 }
-.card-btn.selected,.card-btn:hover{background:#38363a;color:#fff;border-color:#8b779f;}
+.card-btn.selected,.card-btn:hover{
+  background: linear-gradient(135deg, rgba(168,85,247,0.55) 0%, rgba(120,50,220,0.45) 100%);
+  color:#fff;
+  border-color: rgba(168,85,247,0.9);
+  box-shadow: 0 0 18px rgba(168,85,247,0.35);
+}
 .card-btn svg{
   display: inline-block;
   vertical-align: middle;
@@ -135,12 +152,12 @@ body{min-height:100vh;overflow-x:hidden;}
 /* =====按钮优化结束======= */
 
 .ai-sum-blk{margin:32px auto 0 auto;}
-.ai-sum-title{font-size:21px;color:#151616;font-weight:600;margin-bottom:14px;}
+.ai-sum-title{font-size:21px;color:var(--dark-text);font-weight:600;margin-bottom:14px;}
 .ai-sum-text{
   font-size:20px !important; 
   font-weight:bold !important;
   line-height:2;
-  color:#2f2830;
+  color:var(--dark-text);
   min-height:20px; margin-bottom:4px;
   background:transparent; border:none; box-shadow:none; padding:0 1px;
   width:100%; box-sizing:border-box;
@@ -150,7 +167,7 @@ body{min-height:100vh;overflow-x:hidden;}
 .ai-sum-text.mid{color:var(--color-sign-mid);}
 .ai-sum-text.down{color:var(--color-sign-down);}
 .signs-desc-row {
-  font-size:11px; color:#888;
+  font-size:13px; color:var(--dark-text-sec);
   background:none; border:none; box-shadow:none; padding:0 2px;
   text-align:left; margin:18px auto 10px auto;
   width:100%; box-sizing:border-box;
@@ -164,13 +181,17 @@ body{min-height:100vh;overflow-x:hidden;}
   gap:18px;align-items:stretch; width:100%;
 }
 .signcell{
-  background:#f8fafc; border-radius:15px; border:1.13px solid #c9d0d7;
-  box-shadow:0 1.2px 8px #e4e8f010; padding:15px 16px 13px 16px;font-size:16px;color:#232328;
+  background: var(--dark-card); border-radius:15px; border:1.13px solid var(--purple-border);
+  box-shadow: var(--purple-glow); padding:15px 16px 13px 16px;font-size:16px;color:var(--dark-text);
   cursor:pointer;transition:.13s;display:flex;flex-direction:column;justify-content:space-between;position:relative;min-width:0; box-sizing:border-box;
+  backdrop-filter: blur(6px);
 }
-.signcell:hover, .signcell.focused {border-color:#be9ace;box-shadow:0 2px 14px #ae70e944;}
-.sign-title{font-weight:600;color:#2a1a47;font-size:17px;line-height:1.25;}
-.sign-short{color:#7a8ea0;margin:7px 0 0 0;font-size:15px;}
+.signcell:hover, .signcell.focused {
+  border-color: rgba(168,85,247,0.85);
+  box-shadow: 0 0 22px rgba(168,85,247,0.35), 0 0 50px rgba(168,85,247,0.13);
+}
+.sign-title{font-weight:600;color:rgba(220,210,255,0.95);font-size:17px;line-height:1.25;}
+.sign-short{color:var(--dark-text-sec);margin:7px 0 0 0;font-size:15px;}
 .sign-level{
   position:absolute;right:13px;top:10px;
   color:#fff;border-radius:9px;
@@ -182,52 +203,56 @@ body{min-height:100vh;overflow-x:hidden;}
 .sign-level-num{
   margin-left:2px;font-weight:400;font-size:1.19em; color:#fff; opacity:0.76; letter-spacing:1px;}
 .sign-modal-mask{
-  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(120,120,130,0.18);
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,3,13,0.82);
   z-index:333;display:flex;align-items:center;justify-content:center;
   box-sizing:border-box;
   padding:0;
+  backdrop-filter: blur(4px);
 }
 .sign-modal{
   max-width:600px; min-width:320px; width:94vw;
-  background:#fff; border-radius:20px; box-shadow:0 10px 70px #7082c980;
+  background: rgba(12,9,32,0.96); border-radius:20px; box-shadow: var(--purple-glow), 0 10px 70px rgba(168,85,247,0.18);
   padding:38px 34px 28px 34px;
-  color:#361066; position:relative;font-size:19px;line-height:1.72;
+  color:var(--dark-text); position:relative;font-size:19px;line-height:1.72;
   animation:popin .22s cubic-bezier(0.8,1,0.7,1.3);overflow-y:auto;max-height:95vh;
   box-sizing: border-box;
+  border: 1px solid var(--purple-border);
 }
 @keyframes popin{0%{transform:scale(0.4); opacity:0;} 100%{transform:scale(1);opacity:1;}}
-.sign-modal .title{font-size:23px;font-weight:700;margin-bottom:11px;}
+.sign-modal .title{font-size:23px;font-weight:700;margin-bottom:11px;color:rgba(220,210,255,0.95);}
 .sign-modal .level{
   font-size:18px;margin-right:10px;color:#fff;padding:3.5px 19px 3.5px 15px;border-radius:11px;display:inline-flex;align-items:center;gap:7px;}
 .sign-modal .level .sign-level-num{margin-left:5px;font-size:1em;color:#fff;opacity:0.72;font-weight:400;}
 .sign-modal .level.up{background:var(--color-sign-up);}
 .sign-modal .level.mid{background:var(--color-sign-mid);}
 .sign-modal .level.down{background:var(--color-sign-down);}
-.sign-modal .poem{color:#111;border-left:3px solid #acadef;padding-left:15px;line-height:1.8;margin:22px 0 19px 0;font-size:18px;}
+.sign-modal .poem{color:rgba(200,190,240,0.9);border-left:3px solid rgba(168,85,247,0.55);padding-left:15px;line-height:1.8;margin:22px 0 19px 0;font-size:18px;}
 .sign-modal .meaning{color:#0a9957;font-weight:600;margin-top:15px;font-size:18px;}
 .sign-modal .plain{color:#b94963;margin-top:11px;font-size:17px;}
-.sign-modal .story{color:#337ca5;margin-top:11px;font-size:16px;}
-.sign-modal .hint{margin:14px 0 0 0;font-size:15px;color:#a185e0;}
+.sign-modal .story{color:#59a8e0;margin-top:11px;font-size:16px;}
+.sign-modal .hint{margin:14px 0 0 0;font-size:15px;color:rgba(168,85,247,0.75);}
 .sign-modal .close-btn{
   position:absolute;right:18px;top:17px;
-  color:#aaa;font-size:35px;font-weight:700;
+  color:var(--dark-text-sec);font-size:35px;font-weight:700;
   cursor:pointer;transition:.13s;border:none;background:none;}
-.sign-modal .close-btn:hover{color:#bb3434;}
+.sign-modal .close-btn:hover{color:#e06080;}
 .countdown-bottom{
   width:100vw;
   text-align:center;
-  margin:36px 0 11px 0;
-  color:#454545;
+  margin:0;
+  color:rgba(200,190,240,0.8);
   font-size:16.2px;
   opacity:0.93;
   font-weight:600;
   letter-spacing:1.2px;
   position:fixed;
-  bottom:0; left:0; z-index:4; background:rgba(250,250,250,0.91);
+  bottom:0; left:0; z-index:4; background:rgba(8,6,24,0.88);
   padding:8px 0 6px 0;
-  border-top:1px solid #e0e0ef;
+  border-top:1px solid rgba(168,85,247,0.18);
   box-sizing: border-box;
+  backdrop-filter: blur(6px);
 }
+.countdown-bottom span { color: rgba(168,85,247,0.9) !important; }
 @media screen and (max-width:830px){
   .main-logo, .card-ctrlwrap, .ai-sum-blk, .signs-desc-row, .signs-grid-wrap, .ai-sum-text {
     max-width:99vw;
@@ -268,9 +293,7 @@ body{min-height:100vh;overflow-x:hidden;}
   .countdown-bottom{font-size:13.3px;padding:7px 0 5px 0;}
 }
 /* ====== 兼容修正 START ====== */
-/* 去除全局 body 的 padding-bottom，避免PC端滚动条 */
 body { padding-bottom: 0 !important; }
-/* 移动端适配底部空间，防止签文被倒计时遮挡 */
 @media (max-width:600px){
   body { padding-bottom: 62px !important; }
   .signs-grid-wrap { padding-bottom: 46px; }
@@ -294,16 +317,9 @@ body { padding-bottom: 0 !important; }
   </style>
 </head>
 <body>
-<div id="bg-clouds">
-  <svg width="100vw" height="100vh" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100vw;height:100vh">
-    <g>
-      <path id="cloud1" d="M210 150 Q255 130 310 150 Q320 127 350 150 Q375 166 390 150 Q415 120 470 150" stroke="#e1ded9" stroke-width="5" fill="none" opacity="0.28"/>
-      <path id="cloud2" d="M680 110 Q710 90 760 110 Q780 94 820 109 Q850 122 865 101" stroke="#f1eadc" stroke-width="4" fill="none" opacity="0.18"/>
-      <path id="cloud3" d="M990 200 Q1020 190 1050 210 Q1070 195 1120 230 Q1150 245 1170 220" stroke="#e0d9bd" stroke-width="6" fill="none" opacity="0.22"/>
-    </g>
-  </svg>
-</div>
 <canvas id="bg-canvas"></canvas>
+<!-- 返回首页链接 -->
+<a class="back-home" href="index.html">← 返回首页</a>
 <div class="main-logo">
   <a href="index.html">
     <img src="logo2.png" alt="logo">
@@ -348,10 +364,10 @@ body { padding-bottom: 0 !important; }
 <div id="tipDailyPopup" style="display:none;position:fixed;z-index:1999;left:0;top:0;width:100vw;height:100vh;pointer-events:none;">
   <div id="tipDailyInner"
     style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-        background:#fff;padding:30px 22px 22px 22px;border-radius:13px;box-shadow:0 5px 38px #cabcebcc;
-        font-size:16.8px;color:#b30b2f;font-weight:600;max-width:85vw;text-align:center;pointer-events:auto;">
+        background:rgba(14,10,36,0.96);padding:30px 22px 22px 22px;border-radius:13px;box-shadow:0 5px 38px rgba(168,85,247,0.35);
+        font-size:16.8px;color:#e6e0f6;font-weight:600;max-width:85vw;text-align:center;pointer-events:auto;border:1px solid rgba(168,85,247,0.30);">
     每天仅能算一卦哦，明天0点可重新抽签<br>
-    <button style="margin-top:16px;padding:6px 33px;font-size:17px;background:#eee;border:none;border-radius:7px;cursor:pointer;" onclick="hideDailyTipPopup()">我知道了</button>
+    <button style="margin-top:16px;padding:6px 33px;font-size:17px;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.45);border-radius:7px;cursor:pointer;color:#e6e0f6;" onclick="hideDailyTipPopup()">我知道了</button>
   </div>
 </div>
 <div id="aiSumBlk" class="ai-sum-blk" style="display:none;">
@@ -452,8 +468,8 @@ function lockTopicOnce() {
   lockedTopic = true;
   let sel = document.getElementById("topic");
   sel.disabled = true;
-  sel.style.background = "#f3f3f3";
-  sel.style.color = "#bbb";
+  sel.style.background = "rgba(20,14,45,0.85)";
+  sel.style.color = "#777";
 }
 function unlockTopicOnce() {
   lockedTopic = false;
@@ -632,140 +648,71 @@ function updateCountdown(){
   let h = Math.floor(ms/3600000);
   let m = Math.floor((ms%3600000)/60000);
   let s = Math.floor((ms%60000)/1000);
-  let str = `距离明天0点可再次抽签： <span style="color:#000000">${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}</span>`;
+  let str = `距离明天0点可再次抽签： <span style="color:rgba(168,85,247,0.9)">${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}</span>`;
   document.getElementById("countdownTip").innerHTML = str;
 }
 updateCountdown();
 setInterval(updateCountdown, 1000);
-// ========== 背景动画部分，加入中国吉祥物，canvas整体88% ===========
+// ========== Canvas 紫色粒子背景，替换原白色吉祥物 ===========
 (()=>{
   const canvas=document.getElementById('bg-canvas');const ctx=canvas.getContext('2d');
   let dpr=window.devicePixelRatio||1,W=window.innerWidth,H=window.innerHeight,particles=[];
-  // 吉祥物定义
-  const auspiciousTypes = [
-    {name:"元宝",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/50,h/30);ctx.beginPath();ctx.moveTo(5,20);ctx.arcTo(25,40,45,20,23);ctx.arcTo(25,0,5,20,23);ctx.closePath();ctx.fillStyle="#ffe448";ctx.fill();ctx.beginPath();ctx.ellipse(25,12,20,10,0,0,Math.PI*2);ctx.fillStyle="#fff78a";ctx.globalAlpha=0.95;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(25,12,6,0,Math.PI*2);ctx.fillStyle="#ffd000";ctx.fill();ctx.restore();}},
-    {name:"福",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/8);ctx.beginPath();ctx.rect(-w/2,-h/2,w,h);ctx.fillStyle="#ff5959";ctx.fill();ctx.font=`bold ${Math.round(h*0.7)}px serif`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fffde6";ctx.fillText("福",0,3);ctx.restore();}},
-    {name:"鱼",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/50,h/18);ctx.beginPath();ctx.moveTo(7,9);ctx.quadraticCurveTo(29,-2,43,9);ctx.quadraticCurveTo(38,16,32,9);ctx.quadraticCurveTo(25,21,7,9);ctx.closePath();ctx.fillStyle="#ef5246";ctx.globalAlpha=0.94;ctx.fill();ctx.beginPath();ctx.arc(35,9,2,0,2*Math.PI);ctx.fillStyle="#fff";ctx.fill();ctx.beginPath();ctx.arc(36,9,1,0,2*Math.PI);ctx.fillStyle="#222";ctx.fill();ctx.globalAlpha=1;ctx.restore();}},
-    {name:"灯笼",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.ellipse(0,0,w/2,h/2,0,0,2*Math.PI);ctx.fillStyle="#f18222";ctx.globalAlpha=0.9;ctx.fill();ctx.strokeStyle="#d34202";ctx.lineWidth=2;ctx.stroke();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(0,0,w*0.18,0,2*Math.PI);ctx.fillStyle="#fffaed";ctx.fill();ctx.fillStyle="#bc1818";ctx.fillRect(-w*0.1,-h/2-2,w*0.2,5);ctx.fillRect(-2,h/2-2,4,9);ctx.restore();}},
-    {name:"祥云",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/35,h/22);ctx.beginPath();ctx.arc(15,12,8,Math.PI/2,Math.PI*3/2);ctx.arc(25,10,7,Math.PI*1.165,Math.PI*1.835,true);ctx.arc(36,15,6,Math.PI*1.12,Math.PI*1.77);ctx.strokeStyle="#eca92a";ctx.lineWidth=3;ctx.globalAlpha=0.65;ctx.stroke();ctx.restore();}},
-    {name:"铜钱",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,w/2,0,2*Math.PI);ctx.fillStyle="#efd151";ctx.globalAlpha=0.94;ctx.fill();ctx.beginPath();ctx.arc(0,0,w/4,0,2*Math.PI);ctx.globalAlpha=1;ctx.fillStyle="#fffbd3";ctx.fill();ctx.beginPath();ctx.rect(-w/9,-w/9,w/4.5,w/4.5);ctx.fillStyle="#eab300";ctx.fill();ctx.restore();}},
-    {name:"鞭炮",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.rotate(-Math.PI/10);ctx.beginPath();ctx.rect(-w/5,-h/2,w*0.6,h);ctx.fillStyle="#d72b17";ctx.globalAlpha=0.9;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(w*0.2,0,w*0.20,0,2*Math.PI);ctx.fillStyle="#ffe274";ctx.fill();ctx.restore();}},
-    {name:"葫芦",svg:(ctx,x,y,w,h)=>{ctx.save();ctx.translate(x,y);ctx.scale(w/25,h/36);ctx.beginPath();ctx.arc(12.5,10,9,0,Math.PI*2);ctx.arc(12.5,28,13,Math.PI*2,0,true);ctx.fillStyle="#ffbb48";ctx.globalAlpha=0.94;ctx.fill();ctx.beginPath();ctx.arc(12.5,7.5,4,0,2*Math.PI);ctx.fillStyle="#ec962c";ctx.fill();ctx.restore();}}
-  ];
-  let ausList = [];
-  function genAuspicious(total=42){
-    ausList=[];
-    for(let i=0;i<total;i++){
-      let t = auspiciousTypes[Math.floor(Math.random()*auspiciousTypes.length)];
-      let w = Math.random()*32+32;
-      let h = w * (Math.random()*0.4+0.8);
-      let speed = Math.random()*0.22+0.045;
-      let dx = (Math.random()-0.5)*.08;
-      let opa = Math.random()*0.32+0.58;
-      ausList.push({
-        ...t, w, h,
-        x:Math.random()*W, y:Math.random()*H,
-        dx,speed,opa,
-        driftSeed:Math.random()*10,i
-      });
-    }
-  }
   function resize(){
     W=window.innerWidth;H=window.innerHeight;
     canvas.width=W*dpr;canvas.height=H*dpr;
     canvas.style.width=W+"px";canvas.style.height=H+"px";
     ctx.setTransform(1,0,0,1,0,0);ctx.scale(dpr,dpr);
   }
-  function genParticles(num=120){
+  function genParticles(num){
     particles=[];
     for(let i=0;i<num;i++){
-      let size=Math.random()*3+1.2;
-      let opacity=Math.random()*0.35+0.34;
-      let color=Math.random()>0.7?'#eed8d2':(Math.random()>0.35?'#becee8':'#c8b3ea');
-      particles.push({x:Math.random()*W,y:Math.random()*H,dx:(Math.random()-0.5)*0.2,dy:Math.random()*0.16+0.06,r:size,opa:opacity,color});
+      let size=Math.random()*2.8+0.6;
+      let opacity=Math.random()*0.38+0.12;
+      // 紫色调色板
+      let colors = [
+        'rgba(168,85,247,'+opacity+')',
+        'rgba(140,70,230,'+opacity+')',
+        'rgba(190,110,255,'+opacity+')',
+        'rgba(120,50,200,'+(opacity*0.7)+')',
+        'rgba(200,150,255,'+(opacity*0.5)+')'
+      ];
+      let color = colors[Math.floor(Math.random()*colors.length)];
+      particles.push({
+        x:Math.random()*W,
+        y:Math.random()*H,
+        dx:(Math.random()-0.5)*0.25,
+        dy:Math.random()*0.14+0.04,
+        r:size,
+        opacity:opacity,
+        color:color,
+        phase:Math.random()*Math.PI*2
+      });
     }
   }
   function update(){
     ctx.clearRect(0,0,W,H);
-    // 底层云粒子
+    let t = Date.now()/1000;
     for(let p of particles){
-      ctx.globalAlpha=p.opa;
+      ctx.globalAlpha=p.opacity;
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
-      ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=10+10*p.r;
+      ctx.fillStyle=p.color;
+      ctx.shadowColor='rgba(168,85,247,0.6)';
+      ctx.shadowBlur=8+6*p.r;
       ctx.fill();
-      p.x+=p.dx;p.y+=p.dy;
-      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y>H)p.y=0;
-    }
-    ctx.globalAlpha=1.0;
-    // 吉祥物
-    for(let obj of ausList){
-      ctx.save();
-      ctx.globalAlpha = obj.opa;
-      let dy = Math.sin((Date.now()/4000)+obj.driftSeed)*0.35*obj.h;
-      obj.svg(ctx,obj.x, obj.y+dy, obj.w, obj.h);
-      ctx.restore();
-      obj.x += obj.dx;
-      obj.y -= obj.speed;
-      if(obj.x<-60) obj.x=W+Math.random()*30;
-      if(obj.x>W+60) obj.x=-Math.random()*40;
-      if(obj.y<-50) obj.y=H+obj.h+Math.random()*20;
+      p.x+=p.dx + Math.sin(t*0.5+p.phase)*0.08;
+      p.y+=p.dy;
+      if(p.x< -10)p.x=W+10;
+      if(p.x>W+10)p.x=-10;
+      if(p.y>H+10)p.y=-10;
     }
     ctx.globalAlpha=1;
+    ctx.shadowBlur=0;
   }
   function animate(){update();requestAnimationFrame(animate);}
-  window.addEventListener("resize",()=>{resize();genParticles();genAuspicious();});
-  resize();genParticles();genAuspicious();animate();
-})();
-// 云朵动画不变
-(()=>{
-  let c1=document.querySelector('#cloud1'),c2=document.querySelector('#cloud2'),c3=document.querySelector('#cloud3');
-  function floatPath(elem,baseD,timeSeed,amp,speed){
-    let t=(performance.now()/1000)*speed+timeSeed;
-    let d=baseD.replace(/Q([\d ]+),([\d ]+) ([\d ]+),([\d ]+) Q([\d ]+),([\d ]+) ([\d ]+),([\d ]+)/,(m,x1,y1,x2,y2,q1y1,q1y2,q2y1,q2y2)=>{
-      let fy1=(+y1)+Math.sin(t+1)*amp,fy2=(+y2)+Math.cos(t+2)*amp;
-      let fq1=(+q1y2)+Math.sin(t+0.6)*amp*0.7,fq2=(+q2y2)+Math.cos(t+1.2)*amp*0.6;
-      return `Q${x1},${fy1.toFixed(1)} ${x2},${fy2.toFixed(1)} Q${q1y1},${fq1.toFixed(1)} ${q2y1},${fq2.toFixed(1)}`;
-    });
-    elem&&(elem.setAttribute("d",d));
-  }
-  let d1="M210 150 Q255 130 310 150 Q320 127 350 150 Q375 166 390 150 Q415 120 470 150";
-  let d2="M680 110 Q710 90 760 110 Q780 94 820 109 Q850 122 865 101";
-  let d3="M990 200 Q1020 190 1050 210 Q1070 195 1120 230 Q1150 245 1170 220";
-  function step(){
-    floatPath(c1,d1,0,7,0.16);
-    floatPath(c2,d2,1.7,4,0.11);
-    floatPath(c3,d3,3.1,8,0.105);
-    requestAnimationFrame(step);
-  }
-  step();
+  window.addEventListener("resize",()=>{resize();genParticles(100);});
+  resize();genParticles(100);animate();
 })();
 </script>
-    <?php include 'menu.html'; ?>
-
-
-
-
-    <!-- 直接插入菜单HTML，复制到每个页面！ -->
-    <div class="floating-nav">
-        <ul class="nav-list">
-            <li><i class="fas fa-home"></i><a href="index.html">首页</a></li>
-            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
-            <li><i class="fas fa-question-circle"></i><a href="https://qa.dicad.cn" target="_blank">Q&amp;A问答</a></li>
-
-            <li class="main-menu">
-                <i class="fas fa-gamepad"></i>
-                <span>解压游戏</span>
-            </li>
-            <li><i class="fas fa-bug"></i><a href="mifeng.html">蜜蜂大冒险</a></li>
-            <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
-            <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
-        </ul>
-    </div>
-
-
-
-
-
 </body>
 </html>

@@ -8,33 +8,20 @@
     <style>
 
 
-        /* 菜单CSS */
-        .floating-nav {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            background-color: #1E3A5F;
-            border-radius: 8px 0 0 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            overflow: hidden;
-            transition: width 0.3s;
-            width: 50px;
-            z-index: 9999;
+        /* 返回首页链接 */
+        .back-link {
+            display: inline-block;
+            color: rgba(168, 85, 247, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 16px;
+            transition: color 0.3s;
+            z-index: 1;
+            position: relative;
         }
-        .floating-nav:hover { width:250px; }
-        .nav-list {list-style: none; margin:0; padding:0;}
-        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
-        .nav-list li:hover {background:#5E8BFF;}
-        .nav-list li i {font-size:18px; color:#4ECDC4;}
-        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
-        .floating-nav:hover .nav-list li a, 
-        .floating-nav:hover .nav-list li span {opacity:1;}
-        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
-        @media (max-width:768px){.floating-nav{display:none;}}
-        /* 下面放你的其他body样式... */
-
-
+        .back-link:hover {
+            color: rgba(168, 85, 247, 1);
+        }
 
         body {
             margin: 0;
@@ -43,50 +30,52 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            background: #02030d;
             font-family: 'Arial', sans-serif;
             overflow: hidden;
-            position: relative; /* 为LOGO定位提供参考 */
+            position: relative;
         }
         canvas {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: -1;
+            z-index: 0;
         }
         #logo-container {
             position: absolute;
-            top: 0; /* 初始顶部，JS动态调整 */
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
         }
         #logo {
-            max-width: 88px; /* 缩小到2/3（100px * 2/3） */
+            max-width: 88px;
             width: 25vw;
             display: block;
             cursor: pointer;
         }
         #game-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: rgba(12, 14, 28, 0.96);
+            border-radius: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.15), 0 10px 40px rgba(0, 0, 0, 0.5);
             padding: 15px;
             text-align: center;
             max-width: 90vw;
             width: 400px;
             box-sizing: border-box;
             position: relative;
-            z-index: 1; /* 确保游戏框在LOGO和粒子之上 */
+            z-index: 1;
         }
         h1 {
             font-size: 24px;
             margin: 10px 0;
+            color: #d4c5f0;
         }
         #puzzle {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
-            background: #f0f0f0;
+            background: rgba(168, 85, 247, 0.08);
             padding: 8px;
             border-radius: 10px;
             margin: 15px auto;
@@ -96,22 +85,22 @@
         .tile {
             width: 99%;
             height: 80px;
-            background: #ffffff;
+            background: linear-gradient(135deg, #4c1d95, #5b21b6);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: #ffffff;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             touch-action: manipulation;
         }
         .tile:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 6px 15px rgba(0, 0, 0, 0.4);
         }
         .empty {
             background: transparent;
@@ -119,37 +108,40 @@
             cursor: default;
         }
         .highlight {
-            background: #ff9500;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
             color: white;
             transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
         }
         button {
             padding: 18px 20px;
             font-size: 20px;
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            background: linear-gradient(135deg, #7c3aed, #3b82f6);
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             margin: 15px;
             touch-action: manipulation;
         }
         button:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
         }
         button:disabled {
-            background: #ccc;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
             cursor: not-allowed;
         }
         #message {
             margin-top: 15px;
             font-size: 16px;
-            color: #333;
+            color: #a0a0b8;
         }
         .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #6e8efb;
+            border: 3px solid rgba(168, 85, 247, 0.2);
+            border-top: 3px solid #7c3aed;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -168,7 +160,7 @@
                 width: 95vw;
             }
             #logo {
-                max-width: 53px; /* 缩小到2/3（80px * 2/3） */
+                max-width: 53px;
                 width: 20vw;
             }
             h1 {
@@ -205,6 +197,7 @@
         </a>
     </div>
     <div id="game-container">
+        <a href="index.html" class="back-link">&#8592; 返回首页</a>
         <h1>数字滑块拼图</h1>
         <div id="puzzle"></div>
         <button onclick="resetGame()">重新开始</button>
@@ -248,7 +241,7 @@
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
             }
             draw() {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillStyle = 'rgba(168, 85, 247, 0.5)';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -263,6 +256,22 @@
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 绘制粒子间连线
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.12 * (1 - dist / 120)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
             particles.forEach((p, i) => {
                 p.update();
                 p.draw();
@@ -531,26 +540,6 @@
 
         initBoard();
     </script>
-
-
-    <!-- 直接插入菜单HTML，复制到每个页面！ -->
-    <div class="floating-nav">
-        <ul class="nav-list">
-            <li><i class="fas fa-home"></i><a href="index.html">首页</a></li>
-            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
-            <li><i class="fas fa-question-circle"></i><a href="https://qa.dicad.cn" target="_blank">Q&amp;A问答</a></li>
-
-            <li class="main-menu">
-                <i class="fas fa-gamepad"></i>
-                <span>解压游戏</span>
-            </li>
-            <li><i class="fas fa-bug"></i><a href="mifeng.html">蜜蜂大冒险</a></li>
-
-            <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
-            <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
-        </ul>
-    </div>
-
 
 
 

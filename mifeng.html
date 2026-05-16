@@ -7,177 +7,256 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-
-        /* 菜单CSS */
-        .floating-nav {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            background-color: #1E3A5F;
-            border-radius: 8px 0 0 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            overflow: hidden;
-            transition: width 0.3s;
-            width: 50px;
-            z-index: 9999;
-        }
-        .floating-nav:hover { width:250px; }
-        .nav-list {list-style: none; margin:0; padding:0;}
-        .nav-list li {display:flex; align-items:center; padding:10px 15px; border-bottom:1px solid rgba(255,255,255, .2);}
-        .nav-list li:hover {background:#5E8BFF;}
-        .nav-list li i {font-size:18px; color:#4ECDC4;}
-        .nav-list li a, .nav-list li span {color:#fff; text-decoration:none; font-size:16px; margin-left:25px; white-space:nowrap; opacity:0; transition:opacity 0.3s;}
-        .floating-nav:hover .nav-list li a, 
-        .floating-nav:hover .nav-list li span {opacity:1;}
-        .main-menu i, .main-menu span {color:#FFD700 !important;font-weight:bold;}
-        @media (max-width:768px){.floating-nav{display:none;}}
-        /* 下面放你的其他body样式... */
-
-
-
-
+/* ===== Dark Tech Theme ===== */
 html,body {margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;}
-body {background: #b9e2fa;}
-#land_img{
-  position:fixed;left:0;width:100vw;z-index:2;pointer-events:none;
-  background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="140"><ellipse cx="600" cy="130" rx="600" ry="60" fill="%23f6d661"/><path d="M0 98 Q 200 138 500 108 T1200 128 V140H0Z" fill="%23ffe48c" opacity="0.89"/><ellipse cx="450" cy="132" rx="65" ry="16" fill="%23e5c944" opacity="0.8"/><ellipse cx="1000" cy="136" rx="55" ry="14" fill="%23ebd27e" opacity="0.6"/></svg>') bottom left / cover no-repeat;
+body {
+    background:#02030d;
+    font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
 }
+body::before {
+    content:"";
+    position:fixed;inset:0;
+    background:
+        radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 35%),
+        radial-gradient(circle at bottom left, rgba(59,130,246,.15), transparent 35%);
+    pointer-events:none;
+    z-index:0;
+}
+
+/* Grid overlay */
+.grid-overlay {
+    position:fixed;inset:0;
+    background-image:
+        linear-gradient(rgba(168,85,247,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168,85,247,.06) 1px, transparent 1px);
+    background-size:40px 40px;
+    mask-image:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    z-index:0;
+    pointer-events:none;
+}
+
+/* Particle canvas */
+#particleCanvas {position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+/* Back to home link */
+#back-home {
+    position:fixed;top:16px;left:16px;z-index:2001;
+    color:rgba(255,255,255,.35);
+    text-decoration:none;
+    font-size:14px;
+    font-family:inherit;
+    transition:color .3s;
+}
+#back-home:hover {color:#c084fc;}
+
+/* Land ground - dark gradient */
 #land_img {
-  height: 18vh;
-  min-height:96px;
-  max-height:22vw;
-  bottom: 0;
-}
-@media (min-width:641px) {
-  #land_img {bottom: -20px;}
-}
-@media (max-width:640px) {
-  #land_img {
-    bottom: 0;
-    height: 18vh;
+    position:fixed;left:0;width:100vw;z-index:2;pointer-events:none;
+    background:linear-gradient(to top, rgba(20,15,40,.85) 0%, rgba(30,20,50,.5) 40%, transparent 100%);
+    height:18vh;
     min-height:96px;
     max-height:22vw;
-  }
+    bottom:0;
+}
+@media (min-width:641px) {
+    #land_img {bottom:-20px;}
+}
+@media (max-width:640px) {
+    #land_img {
+        bottom:0;
+        height:18vh;
+        min-height:96px;
+        max-height:22vw;
+    }
 }
 
-/* 默认PC端：logo、暂停按钮在顶部对齐 */
-#logo-btn{
-  position:fixed;left:-1em;top:-1.6em;z-index:2000;
-  width:10em;height:10em;
-  display:flex;align-items:center;justify-content:center;
-  padding:0;margin:0;
-  background:transparent;border:none;outline:none;box-shadow:none;cursor:pointer;
+/* Logo button */
+#logo-btn {
+    position:fixed;left:-1em;top:-1.6em;z-index:2000;
+    width:10em;height:10em;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;margin:0;
+    background:transparent;border:none;outline:none;box-shadow:none;cursor:pointer;
+    opacity:.7;transition:opacity .3s;
 }
-#logo-btn img{
-  display:block;width:4.6em;height:4.6em;
-  object-fit:contain;
-  border-radius:0;
-  background:transparent;
-  box-shadow:none;
-}
-#pauseBtn{
-  position:fixed;top:1em;right:1em;z-index:2000;
-  background:#fffbe7; border:2px solid #ceb72c; border-radius:2em;
-  width:5em; height:5em;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  box-shadow:0 6px 21px #d9d58d25;cursor:pointer;outline:none;font-family:inherit;padding:0;overflow:hidden;transition:background .1s;
-}
-#pauseBtnIcon{display:block;width:2.3em;height:2.3em;line-height:1;text-align:center;}
-#pauseBtnText{font-size:0.85em;color:#ceb72c;font-weight:bold;text-align:center;line-height:1;}
-
-/* 手机端：logo、暂停按钮底部对齐 */
-@media (max-width:640px){
-  #logo-btn{
-    top: ; bottom:-1em; left:-1em;
-    width:10em; height:10em;
-    /* 其余不变 */
-  }
-  #pauseBtn{
-    top: ; bottom:1.2em; right:1em;
-    /* 其余不变 */
-  }
+#logo-btn:hover {opacity:1;}
+#logo-btn img {
+    display:block;width:4.6em;height:4.6em;
+    object-fit:contain;border-radius:0;
+    background:transparent;box-shadow:none;
 }
 
-/* 游戏结束弹窗加粗边框色 */
-#overbox{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99;display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:.23s;background:rgba(186,218,142,0.88);}
-#overbox.show{visibility:visible;opacity:1;}
-#overinner{
-  background:linear-gradient(120deg,rgba(255,248,218,.96),rgba(255,221,182,.08));
-  border-radius:1.18em;
-  padding:2.1em 2em 1.22em 2em;
-  min-width:66vw;max-width:95vw;
-  text-align:center;
-  box-shadow:0 8px 38px #e1eac244;
-  border:6px solid #ffd93a;
+/* Pause button - purple glow */
+#pauseBtn {
+    position:fixed;top:1em;right:1em;z-index:2000;
+    background:rgba(20,18,38,.85);
+    border:2px solid rgba(168,85,247,.4);
+    border-radius:2em;
+    width:5em;height:5em;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 0 20px rgba(168,85,247,.15);
+    cursor:pointer;outline:none;font-family:inherit;padding:0;overflow:hidden;
+    transition:background .2s,border-color .2s,box-shadow .2s;
+    backdrop-filter:blur(8px);
 }
-#overinner h2{margin:0 0 .47em 0;font-size:1.48em;font-weight:900;color:#ddb937;}
-#overinner .score{font-size:2.05em;color:#ffd93a;margin:.47em 0 .2em 0;font-weight:800;}
-#overinner .hiscore{font-size:1.05em;color:#60e8c2;opacity:.77;}
-#overinner .timer{font-size:1.22em;margin:.5em 0;color:#d28a16;font-weight:bold;}
-#overinner .poem{margin:1.1em 0 1em 0;color:#6eb570;font-size:1.08em;font-family:"楷体","STKaiti",serif;}
-#overinner button{background:linear-gradient(97deg,#e6f39d 60%,#ffd93a 150%);color:#3f2811;font-size:1.05em;font-weight:700;border:none;border-radius:.7em;padding:.8em 2.26em;box-shadow:0 2px 17px #bfd81921;cursor:pointer;}
-#overinner button:active{background:linear-gradient(96deg,#ffd93a 80%,#bee98e 230%);color:#fff;}
-#gamecanvas{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:1;}
-#pause_mask {position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:1200;background:rgba(255,255,220,0.24);display:none;}
-#pause_mask.show {display:block;}
-#pause_center_text{position:fixed;left:50vw;top:50vh;transform:translate(-50%,-66%);font-size:2.2em;color:#bca207;font-weight:900;z-index:1220;text-shadow:0 0 16px #fffca9;display:none;}
-#pause_center_text.show{display:block;}
-.score-box{position:fixed;top:22px;left:50%;transform:translateX(-50%);font-size:2em;font-weight:700;color:#ffd93a;z-index:10;text-shadow:0 2px 7px #956706;display:none;}
+#pauseBtn:hover {
+    border-color:rgba(168,85,247,.7);
+    box-shadow:0 0 28px rgba(168,85,247,.3);
+}
+#pauseBtnIcon {display:block;width:2.3em;height:2.3em;line-height:1;text-align:center;}
+#pauseBtnText {
+    font-size:0.85em;color:#c084fc;font-weight:bold;text-align:center;line-height:1;
+}
+
+/* Mobile: logo and pause at bottom */
+@media (max-width:640px) {
+    #logo-btn {bottom:-1em;left:-1em;top:auto;}
+    #pauseBtn {bottom:1.2em;right:1em;top:auto;}
+}
+
+/* Score box - purple glow */
+.score-box {
+    position:fixed;top:22px;left:50%;transform:translateX(-50%);
+    font-size:2em;font-weight:700;
+    color:#c084fc;
+    z-index:10;
+    text-shadow:0 0 16px rgba(168,85,247,.5),0 2px 4px rgba(0,0,0,.6);
+    display:none;
+}
+
+/* Tip message */
 #tipmsg {
-  position:fixed;
-  left:50%;
-  bottom:5px;
-  transform:translateX(-50%);
-  z-index:50;
-  background:rgba(255,242,230,0.8);
-  color:#513e0b;
-  padding:.6em 1.2em;
-  font-size:0.99em;
-  border-radius:1em;
-  box-shadow:0 2px 8px #c2e48624;
-  user-select:none;
-  text-align:center;
-  min-width:30vw;
+    position:fixed;
+    left:50%;
+    bottom:5px;
+    transform:translateX(-50%);
+    z-index:50;
+    background:rgba(20,18,38,.88);
+    color:#c5c5d5;
+    padding:.6em 1.2em;
+    font-size:0.99em;
+    border-radius:1em;
+    border:1px solid rgba(168,85,247,.25);
+    box-shadow:0 0 20px rgba(168,85,247,.1);
+    user-select:none;
+    text-align:center;
+    min-width:30vw;
 }
-#startcount {position:fixed;top:50%;left:50%;transform:translate(-50%,-55%);z-index:10000;font-family:'Arial Black','微软雅黑','HeiTi',sans-serif;font-weight:bold;color:#1b99f6;text-shadow:0 9px 28px #fff, 0 2px 0 #fff;display:none;pointer-events:none;}
 
-/* PC端“请点击…”不变，手机端一行显示并缩小字号 */
+/* Start countdown */
+#startcount {
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-55%);z-index:10000;
+    font-family:'Arial Black','微软雅黑','HeiTi',sans-serif;font-weight:bold;
+    color:#a855f7;
+    text-shadow:0 0 20px rgba(168,85,247,.4),0 0 40px rgba(168,85,247,.2);
+    display:none;pointer-events:none;
+}
+
+/* Choose position message */
 #chooseposmsg {
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  z-index:10001;
-  font-size:1.39em;
-  color:#ddb937;
-  font-weight:900;
-  display:none;
-  background:rgba(255,255,220,0.92);
-  padding:1.2em 2.2em 0.9em 2.2em;
-  border-radius:1em;
-  box-shadow:0 2px 21px #dbe98944;
-  white-space:normal;
-  word-break:break-all;
-  max-width:92vw;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:10001;
+    font-size:1.39em;
+    color:#c084fc;
+    font-weight:900;
+    display:none;
+    background:rgba(20,18,38,.92);
+    border:1px solid rgba(168,85,247,.3);
+    padding:1.2em 2.2em 0.9em 2.2em;
+    border-radius:1em;
+    box-shadow:0 0 30px rgba(168,85,247,.15);
+    white-space:normal;
+    word-break:break-all;
+    max-width:92vw;
 }
-@media (max-width:640px){
-  #chooseposmsg {
-    font-size:1em;
-    white-space:nowrap;
-    padding:1.2em 1.5em 0.9em 1.5em;
-    text-overflow:ellipsis;
-    overflow:hidden;
-    max-width:94vw;
-  }
+@media (max-width:640px) {
+    #chooseposmsg {
+        font-size:1em;
+        white-space:nowrap;
+        padding:1.2em 1.5em 0.9em 1.5em;
+        text-overflow:ellipsis;
+        overflow:hidden;
+        max-width:94vw;
+    }
 }
+
+/* Game Over Box - purple glass */
+#overbox {
+    position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99;
+    display:flex;align-items:center;justify-content:center;
+    visibility:hidden;opacity:0;transition:.23s;
+    background:rgba(2,3,13,.88);
+    backdrop-filter:blur(8px);
+}
+#overbox.show {visibility:visible;opacity:1;}
+#overinner {
+    background:linear-gradient(135deg,rgba(20,18,38,.96),rgba(30,25,50,.88));
+    border-radius:1.18em;
+    padding:2.1em 2em 1.22em 2em;
+    min-width:66vw;max-width:95vw;
+    text-align:center;
+    border:1px solid rgba(168,85,247,.35);
+    box-shadow:0 0 40px rgba(168,85,247,.2),0 8px 32px rgba(0,0,0,.5);
+}
+#overinner h2 {margin:0 0 .47em 0;font-size:1.48em;font-weight:900;color:#c084fc;}
+#overinner .score {
+    font-size:2.05em;color:#a855f7;margin:.47em 0 .2em 0;font-weight:800;
+    text-shadow:0 0 16px rgba(168,85,247,.3);
+}
+#overinner .hiscore {font-size:1.05em;color:#7c8aff;opacity:.77;}
+#overinner .timer {font-size:1.22em;margin:.5em 0;color:#c084fc;font-weight:bold;}
+#overinner .poem {
+    margin:1.1em 0 1em 0;color:#9b8ec4;font-size:1.08em;
+    font-family:"楷体","STKaiti",serif;
+}
+#overinner button {
+    background:linear-gradient(135deg,#3b82f6,#a855f7);
+    color:#fff;font-size:1.05em;font-weight:700;
+    border:none;border-radius:.7em;
+    padding:.8em 2.26em;
+    box-shadow:0 0 20px rgba(168,85,247,.3);
+    cursor:pointer;transition:transform .2s,box-shadow .2s;
+}
+#overinner button:hover {
+    transform:translateY(-2px);
+    box-shadow:0 0 30px rgba(168,85,247,.5);
+}
+
+/* Game canvas */
+#gamecanvas {position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:2;}
+
+/* Pause mask & text */
+#pause_mask {
+    position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:1200;
+    background:rgba(2,3,13,.5);
+    backdrop-filter:blur(4px);
+    display:none;
+}
+#pause_mask.show {display:block;}
+#pause_center_text {
+    position:fixed;left:50vw;top:50vh;
+    transform:translate(-50%,-66%);
+    font-size:2.2em;
+    color:#a855f7;
+    font-weight:900;
+    z-index:1220;
+    text-shadow:0 0 20px rgba(168,85,247,.4);
+    display:none;
+}
+#pause_center_text.show {display:block;}
 </style>
 </head>
 <body>
+<div class="grid-overlay"></div>
+<canvas id="particleCanvas"></canvas>
+<a href="index.html" id="back-home">← 返回首页</a>
 <!-- LOGO按钮 -->
 <button id="logo-btn" title="返回首页" onclick="window.location.href='index.html'"><img src="logo.png" alt="logo"/></button>
-<div class="score-box">分数：<span id="score">0</span></div>
-<div id="tipmsg">游戏规则：<br>拖动蜜蜂躲避炸弹和鸟，吃金币、金条、钻石！</div>
+<div class="score-box">分数:<span id="score">0</span></div>
+<div id="tipmsg">游戏规则:<br>拖动蜜蜂躲避炸弹和鸟,吃金币、金条、钻石!</div>
 <div id="startcount"></div>
 <div id="chooseposmsg">请点击屏幕选择蜜蜂出现的位置</div>
 <div id="overbox"><div id="overinner">
@@ -237,11 +316,11 @@ window.addEventListener('resize',()=>resize(true));resize();
 
 const FLOWER_COLORS = ["#f4a","#ffa221","#ff9bf6","#fff1c6","#d8edff","#fef","#fff8d6"];
 const poetries = [
-"花间一壶酒，独酌无相亲。<br><i style='font-size:0.93em;opacity:0.7;'>——李白</i>",
-"采得百花成蜜后，为谁辛苦为谁甜。<br><i style='font-size:0.93em;opacity:0.7;'>——罗隐</i>",
-"春色满园关不住，一枝红杏出墙来。<br><i style='font-size:0.93em;opacity:0.7;'>——叶绍翁</i>",
-"儿童急走追黄蝶，飞入菜花无处寻。<br><i style='font-size:0.93em;opacity:0.7;'>——杨万里</i>",
-"沾衣欲湿杏花雨，吹面不寒杨柳风。<br><i style='font-size:0.93em;opacity:0.7;'>——志南</i>"
+"花间一壶酒,独酌无相亲。<br><i style='font-size:0.93em;opacity:0.7;'>--李白</i>",
+"采得百花成蜜后,为谁辛苦为谁甜。<br><i style='font-size:0.93em;opacity:0.7;'>--罗隐</i>",
+"春色满园关不住,一枝红杏出墙来。<br><i style='font-size:0.93em;opacity:0.7;'>--叶绍翁</i>",
+"儿童急走追黄蝶,飞入菜花无处寻。<br><i style='font-size:0.93em;opacity:0.7;'>--杨万里</i>",
+"沾衣欲湿杏花雨,吹面不寒杨柳风。<br><i style='font-size:0.93em;opacity:0.7;'>--志南</i>"
 ];
 function PLAY_LEFT(){return BEE_SIZE()*0.5;}
 function PLAY_RIGHT(){return W-BEE_SIZE()*0.5;}
@@ -276,8 +355,8 @@ const pauseCenterText = document.getElementById('pause_center_text');
 let gamePaused = false;
 function setPauseBtnView(){
     let icon=gamePaused
-        ?'<svg width="32" height="32" viewBox="0 0 32 32"><polygon points="11,8 24,16 11,24" fill="#ceb72c" /></svg>'
-        :'<svg width="32" height="32" viewBox="0 0 32 32"><rect x="8" y="8" width="4.6" height="16" rx="2" fill="#ceb72c"/><rect x="19" y="8" width="4.6" height="16" rx="2" fill="#ceb72c"/></svg>';
+        ?'<svg width="32" height="32" viewBox="0 0 32 32"><polygon points="11,8 24,16 11,24" fill="#c084fc" /></svg>'
+        :'<svg width="32" height="32" viewBox="0 0 32 32"><rect x="8" y="8" width="4.6" height="16" rx="2" fill="#c084fc"/><rect x="19" y="8" width="4.6" height="16" rx="2" fill="#c084fc"/></svg>';
     pauseBtnIcon.innerHTML=icon;
     pauseBtnText.innerText=gamePaused?"继续":"暂停";
 }
@@ -454,7 +533,7 @@ function update(){
             state="wait_bee_pos";
             bee=null; beeReady=false;
             startCountDiv.style.display="none";
-            scorebox.innerHTML = "分数：<span id=\"score\">0</span>";
+            scorebox.innerHTML = "分数:<span id=\"score\">0</span>";
             scorebox.style.display="block";
             tipmsg.style.display="none";
             choosePosMsg.style.display = "block";
@@ -462,7 +541,7 @@ function update(){
         }else if(!needShowCountdown && state==="countdown" && (countdown_ts <= Date.now())){
             state="wait_bee_pos";
             bee=null; beeReady=false;
-            scorebox.innerHTML = "分数：<span id=\"score\">0</span>";
+            scorebox.innerHTML = "分数:<span id=\"score\">0</span>";
             scorebox.style.display="block";
             tipmsg.style.display = "none";
             choosePosMsg.style.display = "block";
@@ -574,9 +653,9 @@ function gameOver(){
     scorebox.style.display="block";
     setTimeout(()=>{
         overbox.classList.add("show");
-        overScore.innerHTML='得分：'+score;
+        overScore.innerHTML='得分:'+score;
         if(score>hiscore) hiscore=score,localStorage['__beefreeHi2024']=score;
-        overHis.innerHTML="历史最高："+hiscore;
+        overHis.innerHTML="历史最高:"+hiscore;
         overPoem.innerHTML=poetries[Math.floor(Math.random()*poetries.length)];
     },260);
 }
@@ -586,7 +665,7 @@ function startNewGame(){
     countdown_ts=Date.now()+6000;
     bee=null; beeReady=false; beeFirstClick=false;
     objs.length=0;t=0;score=0;
-    scorebox.innerHTML = "分数：<span id=\"score\">0</span>";
+    scorebox.innerHTML = "分数:<span id=\"score\">0</span>";
     tipmsg.style.display="block";
     startCountDiv.style.display="none";
     choosePosMsg.style.display = "none";
@@ -618,7 +697,7 @@ c.addEventListener('mousedown',function(e){
         nextObjT = t+10;
         choosePosMsg.style.display="none";
         dragging = false;
-        scorebox.innerHTML = "分数：<span id=\"score\">0</span>";
+        scorebox.innerHTML = "分数:<span id=\"score\">0</span>";
         scorebox.style.display="block";
         return;
     }else if(state==="play" && beeReady && !gamePaused){
@@ -655,7 +734,7 @@ c.addEventListener('touchstart',function(e){
         nextObjT = t+10;
         choosePosMsg.style.display="none";
         dragging = false;
-        scorebox.innerHTML = "分数：<span id=\"score\">0</span>";
+        scorebox.innerHTML = "分数:<span id=\"score\">0</span>";
         scorebox.style.display="block";
         return;
     }else if(state==="play" && beeReady && !gamePaused){
@@ -682,28 +761,57 @@ needShowCountdown = false;
 startNewGame();
 render();
 update();
+
+// ── Particle Network Canvas ──
+(function(){
+    const pcvs=document.getElementById('particleCanvas');
+    if(!pcvs)return;
+    const pctx=pcvs.getContext('2d');
+    let pW,pH,dots=[];
+    const N=60,MAX_D=135;
+    function pResize(){
+        pW=pcvs.width=window.innerWidth;
+        pH=pcvs.height=window.innerHeight;
+    }
+    pResize();window.addEventListener('resize',pResize);
+    for(let i=0;i<N;i++){
+        dots.push({
+            x:Math.random()*pW,y:Math.random()*pH,
+            vx:(Math.random()-.5)*.45,
+            vy:(Math.random()-.5)*.45,
+            r:Math.random()*1.6+.7
+        });
+    }
+    function pDraw(){
+        pctx.clearRect(0,0,pW,pH);
+        for(let i=0;i<N;i++){
+            let d=dots[i];
+            d.x+=d.vx;d.y+=d.vy;
+            if(d.x<0||d.x>pW)d.vx*=-1;
+            if(d.y<0||d.y>pH)d.vy*=-1;
+            d.vx*=.995;d.vy*=.995;
+            pctx.beginPath();
+            pctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+            pctx.fillStyle='rgba(168,85,247,.28)';
+            pctx.fill();
+            for(let j=i+1;j<N;j++){
+                let o=dots[j];
+                let dx=o.x-d.x,dy=o.y-d.y,dist=Math.sqrt(dx*dx+dy*dy);
+                if(dist<MAX_D){
+                    pctx.beginPath();
+                    pctx.moveTo(d.x,d.y);
+                    pctx.lineTo(o.x,o.y);
+                    pctx.strokeStyle='rgba(168,85,247,'+((1-dist/MAX_D)*.15)+')';
+                    pctx.lineWidth=.5;
+                    pctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(pDraw);
+    }
+    pDraw();
+})();
 </script>
-
-
-
-    <!-- 直接插入菜单HTML，复制到每个页面！ -->
-    <div class="floating-nav">
-        <ul class="nav-list">
-            <li><i class="fas fa-home"></i><a href="index.html">首页</a></li>
-            <li><i class="fas fa-download"></i><a href="https://median.co/share/mpzpnw" target="_blank">APP下载</a></li>
-			<li><i class="fas fa-question-circle"></i><a href="https://qa.dicad.cn" target="_blank">Q&amp;A问答</a></li>
-
-            <li class="main-menu">
-                <i class="fas fa-gamepad"></i>
-                <span>解压游戏</span>
-            </li>
-
-            <li><i class="fas fa-puzzle-piece"></i><a href="shuzhi.html">数字滑块拼图</a></li>
-            <li><i class="fas fa-brain"></i><a href="100qian.html">AI算命</a></li>
-            <li><i class="fas fa-cubes"></i><a href="fangkuai.html">AI成语方块消消乐</a></li>
-        </ul>
-    </div>
-
 
 
 
